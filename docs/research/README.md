@@ -22,6 +22,8 @@ Decision:
 
 ## Initial Queue
 
+- Local prior art: `palette`
+- Local prior art: `prettyplease`
 - Context7
 - Superpowers
 - Anthropic LSP plugins
@@ -37,4 +39,7 @@ Decision:
 
 Most existing tools improve agent capability or workflow. The open opportunity
 is a repo-local harness that turns design-system and architecture rules into
-generators, checks, hooks, and CI gates.
+checks, hooks, verification evidence, and, when proven necessary, generators.
+
+The current bias is extraction over invention: prove the harness by lifting
+working machinery out of local repos first.

@@ -17,7 +17,7 @@ The senior design-engineer role is not just taste, implementation, or prompt
 craft. It is the ability to compile product judgment into:
 
 ```text
-CLI verbs -> generated structure -> local docs -> deterministic checks -> hooks/CI gates
+CLI verbs -> generated or exemplar structure -> local docs -> deterministic checks -> hooks/CI gates
 ```
 
 For UI work, this means agents do not invent ad hoc surfaces. They use the
@@ -35,11 +35,14 @@ Weak agents should not need taste. They should have a small legal move set.
 This repo will track research and prototypes around:
 
 - Design-system enforcement for agent-generated UI.
-- CLI generators for paved-road product and engineering work.
+- CLI generators and exemplar-driven workflows for paved-road product and
+  engineering work.
 - Hooks that block architectural drift.
 - Local `AGENTS.md` files that make repo rules discoverable.
 - Skills/plugins that encode design-engineer workflows.
 - Checkers that turn subjective review into mechanical feedback.
+- A verification ledger that records what actually passed, against which tree.
+- Escape-hatch accounting as a drift metric.
 
 ## Existing Tools To Build Around
 
@@ -52,6 +55,12 @@ These tools appear complementary rather than direct substitutes:
 
 The missing layer is repo-specific executable architecture.
 
+This repo should extract from working local prior art before inventing new
+systems. `palette` and `prettyplease` already contain early versions of the
+core idea: design-system checks, token drift gates, change-scoped verification
+lanes, hook wiring, warning/error tiers, and explicit `design-ok:` escape
+hatches.
+
 ## Working Product Idea
 
 Working name: **Agent Rails** or **Repo Harness**.
@@ -61,12 +70,17 @@ Example interface:
 ```bash
 agent-harness init
 agent-harness scan
-agent-harness make component UserMenu
-agent-harness make endpoint invoices.create
 agent-harness check changed
 agent-harness check architecture
+agent-harness verify ios-design
+agent-harness status
+agent-harness assert ios-design
 agent-harness explain-rules
 ```
+
+Generator commands such as `agent-harness make component UserMenu` remain a
+hypothesis. They should follow evidence that exemplars plus checks are not
+enough.
 
 Example config:
 
@@ -94,6 +108,17 @@ backend:
     - auth
     - migrations
 ```
+
+## First Sequence
+
+1. Extract the design-system checks and lane dispatch patterns from `palette`
+   and `prettyplease`.
+2. Prototype a local verification ledger on top of an existing repo's
+   `make *-verify` targets.
+3. Count escape hatches such as `design-ok:` and report them as drift.
+4. Stand up an agentic eval: same tasks, weak model, with and without rails.
+5. Revisit generators only after the eval shows where exemplars plus checks
+   fall short.
 
 ## Position
 
