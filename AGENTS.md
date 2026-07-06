@@ -36,6 +36,8 @@ The repo should favor:
 ## File Map
 
 - `README.md`: current thesis and product direction.
+- `docs/onboarding.md`: new-project vs existing-project setup, scan, and
+  migration flow.
 - `docs/position.md`: the longer initial argument.
 - `docs/research/README.md`: research queue and evaluation template.
 - `docs/research/reuse-map.md`: local prior art to extract.

@@ -11,6 +11,9 @@ Core CLI:
 
 ```bash
 designengineer init
+designengineer init --adopt
+designengineer init --new
+designengineer scan
 designengineer check changed
 designengineer verify <check>
 designengineer verify factory.<factory>
@@ -53,6 +56,11 @@ hooks/
 ```
 
 The CLI is the product. Plugins only teach agents to use it.
+
+The first run has two modes. `init --adopt` scans an existing project and
+proposes wrappers around current hooks, checks, assets, and style language.
+`init --new` creates a thin starter contract for a blank repo. See
+`docs/onboarding.md`.
 
 There is one evidence system. `factory check web-tokens` writes the same
 ledger entry as `verify factory.web-tokens`, and `assert factory.web-tokens`

@@ -73,6 +73,8 @@ Example interface:
 
 ```bash
 designengineer init
+designengineer init --adopt
+designengineer init --new
 designengineer scan
 designengineer check changed
 designengineer check architecture
@@ -134,6 +136,11 @@ The canonical sequence lives in `docs/validation-plan.md`. README should only
 state the product bias: prove the harness in `palette`, register the fast
 web-token factory candidate first, add taught failures and work orders before
 claiming eval success, then generalize only pieces that improve metrics.
+
+The first-run experience is split in `docs/onboarding.md`: adopt existing
+projects by scanning and wrapping their current hooks, scripts, assets, and
+style language before adding new rules; start new projects with only a thin
+paved road.
 
 ## Position
 
