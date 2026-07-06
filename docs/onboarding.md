@@ -31,7 +31,7 @@ and a proposed config.
 Existing projects get an audit first:
 
 ```text
-detect -> classify -> propose -> wrap -> measure -> promote
+detect -> classify -> propose scope -> wrap -> measure -> promote
 ```
 
 Detection should look for:
@@ -61,6 +61,8 @@ prose-only      rule exists only in docs or agent instructions
 source-only     source of truth exists but no generated output or check
 generated       output exists but freshness is unclear
 candidate       close to a rulepack or factory after light normalization
+detected-deferred useful signal, but outside the current adoption scope
+unmanaged       known workflow that should not be gated yet
 unknown         human review needed
 ```
 
@@ -77,6 +79,32 @@ The product should then suggest the smallest safe moves:
 
 For an existing project, the first win is not adding rules. The first win is
 making current rules visible, runnable, and measurable.
+
+## PR Scope Hygiene
+
+Adoption must also protect PR scope. A scanner will often find useful but
+unrelated work: generated app icons, brand asset scripts, new preview surfaces,
+or app files changed by another workflow. Those findings should be reported,
+not silently adopted.
+
+`designengineer scan` should separate:
+
+```text
+included            files the adoption PR should create or modify
+detected-deferred   useful findings left out of this PR
+unmanaged           workflows intentionally not gated
+unrelated-dirty     local changes the harness must not stage
+```
+
+`designengineer adopt --from-scan` should stage only `included` files. A
+`--verify-scope` pass should fail when:
+
+- a registered factory references an untracked source or preview file
+- a rule `exemplar:` path is missing or untracked
+- generated asset outputs are staged without their source and check
+- unrelated dirty files enter the adoption commit
+
+This is the practical difference between `detected` and `adopted`.
 
 ## New Project Path
 
@@ -115,13 +143,14 @@ ladder:
 
 1. **Inventory**: scan current hooks, scripts, docs, assets, and checks.
 2. **Name**: assign stable check IDs and rule IDs.
-3. **Wrap**: register existing scripts as `rulepack.<id>` or
+3. **Scope**: decide which detected findings are included in this PR.
+4. **Wrap**: register existing scripts as `rulepack.<id>` or
    `factory.<id>`.
-4. **Teach**: add `fix:` and `exemplar:` output to failures.
-5. **Measure**: append ledger entries and count escape hatches.
-6. **Gate**: wire fast checks to pre-commit, slow checks to pre-push or CI.
-7. **Promote**: move WARN rules to ERROR only after data shows they are clean.
-8. **Factory**: when the same violation repeats, build a source-to-output
+5. **Teach**: add `fix:` and `exemplar:` output to failures.
+6. **Measure**: append ledger entries and count escape hatches.
+7. **Gate**: wire fast checks to pre-commit, slow checks to pre-push or CI.
+8. **Promote**: move WARN rules to ERROR only after data shows they are clean.
+9. **Factory**: when the same violation repeats, build a source-to-output
    factory instead of adding more prose.
 
 This lets mature repos keep momentum. The harness starts as an observability
@@ -145,6 +174,11 @@ Recommended:
   wrap scripts/ios/no-em-dash-check.sh as rulepack.copy-style
   add ledger evidence for make ios-verify
   leave all new rules as WARN
+
+Deferred:
+  detected app icon asset workflow, not included in this PR
+  detected design dashboard preview, missing committed snapshot check
+  ignored unrelated dirty app files
 ```
 
 Every recommendation should include:

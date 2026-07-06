@@ -25,6 +25,7 @@ Decision:
 - Local prior art: `palette`
 - Local prior art: `shaba`
 - Local prior art: `prettyplease`
+- Local prior art: `str8flush`
 - Rulepack extraction
 - Moveset extensions
 - Factory patterns
@@ -53,3 +54,5 @@ See `factory-patterns.md` for the narrower generator claim that has local
 evidence.
 See `rulepacks.md` for the lightweight way to normalize repo-specific taste
 checks without replacing existing scripts.
+See `str8flush-adoption-lessons.md` for the first adoption PR lessons around
+scope hygiene, deferred findings, aggregate checks, and exemplar integrity.

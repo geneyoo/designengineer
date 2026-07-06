@@ -97,6 +97,41 @@ The harness should parse rule IDs from output when possible. If an existing
 script cannot emit structured output yet, the first wrapper can map its command
 to a coarse rule ID such as `ios-design` and improve precision later.
 
+## Aggregate Checks
+
+Some repos have one fast script that enforces several rulepacks. Do not split
+that into repeated executions just to get cleaner names. Register the script as
+an aggregate check and let one pass freshen narrower rulepack entries:
+
+```yaml
+checks:
+  ios-design:
+    kind: aggregate
+    command: make ios-design-check
+    freshens:
+      - rulepack.ios-design-system
+      - rulepack.content-copy
+      - rulepack.ios-architecture
+```
+
+This keeps the local loop fast while giving work orders and reports precise
+rulepack names.
+
+## Exemplar Integrity
+
+Every `exemplar:` path emitted by a rule must exist and be committed or staged
+in the same adoption scope. A failure that points to an untracked preview file
+is worse than no exemplar because weak agents will copy from unstable context.
+
+Add a meta-check:
+
+```bash
+designengineer check exemplars
+```
+
+It should fail when an exemplar path is missing, ignored, untracked, or outside
+the current PR scope.
+
 ## Existing Local Prior Art
 
 ### Shaba copy style
@@ -160,10 +195,11 @@ block assets or UI that ignore them.
 2. Register it in `.designengineer/config.yaml` as a rulepack.
 3. Add stable rule IDs.
 4. Add `fix:` and `exemplar:` output.
-5. Add escape-hatch counting.
-6. Wire fast rulepacks to pre-commit.
-7. Wire slow rulepacks to pre-push, CI, or explicit `verify`.
-8. Record every run in `.designengineer/ledger.jsonl`.
+5. Verify all exemplars are committed or staged.
+6. Add escape-hatch counting.
+7. Wire fast rulepacks to pre-commit.
+8. Wire slow rulepacks to pre-push, CI, or explicit `verify`.
+9. Record every run in `.designengineer/ledger.jsonl`.
 
 This preserves the dopamine loop: the user keeps the Makefile target and the
 fast hook, while agents gain a mechanical contract.

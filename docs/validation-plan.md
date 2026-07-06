@@ -21,6 +21,7 @@ designengineer status
 designengineer assert <check>
 designengineer workorder create
 designengineer exemplars list [kind]
+designengineer check exemplars
 designengineer factory list
 designengineer factory run <factory>
 designengineer factory check <factory>      # alias for verify factory.<factory>
@@ -107,6 +108,8 @@ V0 should prove value inside `palette` before becoming generic.
    - record stable rule IDs such as `copy.no-em-dash`
    - preserve existing Makefile and hook entry points
    - send output through the same ledger as other checks
+   - support aggregate checks that freshen split rulepack IDs
+   - verify every `exemplar:` path is committed or staged
 
 4. Add lightweight work orders:
    - `scope.allow`
@@ -209,6 +212,7 @@ Task set:
 - make a tokenized color/style change
 - update the web-token factory candidate
 - render an app screenshot or icon factory
+- adopt an existing repo harness without staging unrelated dirty files
 - fix a known design-system violation
 
 Measure:
@@ -225,12 +229,15 @@ Measure:
 - flaky-rule count
 - factory freshness rate
 - manual cleanup required after factory run
+- unrelated files staged in adoption PR
+- detected-deferred findings count
 
 Success criteria:
 
 - lower review churn
 - fewer out-of-scope edits
 - fewer design-system violations
+- adoption PR contains only proposed scope files
 - equal or lower time to verified green for small tasks
 - no pre-commit path over the latency budget
 
@@ -242,6 +249,7 @@ Failure criteria:
 - check failures require interpretation from a senior
 - flaky or noisy rules persist
 - factory checks create a parallel evidence path outside the ledger
+- adoption PR mixes unrelated generated assets or feature work
 
 ## Sequence
 
@@ -249,13 +257,15 @@ Failure criteria:
 2. Add taught failures to one design-system check.
 3. Register one fast rulepack candidate, starting with an existing
    design-system or copy-style script.
-4. Add escape-hatch counting.
-5. Register `web-tokens` as the first factory candidate.
-6. Wire `factory check web-tokens` to `verify factory.web-tokens`.
-7. Add or declare the missing token preview path.
-8. Add one work-order path for a weak-agent task.
-9. Run the eval.
-10. Generalize only the pieces that improve metrics.
+4. Add adoption scope output: included, detected-deferred, unmanaged, and
+   unrelated-dirty files.
+5. Add escape-hatch counting.
+6. Register `web-tokens` as the first factory candidate.
+7. Wire `factory check web-tokens` to `verify factory.web-tokens`.
+8. Add or declare the missing token preview path.
+9. Add one work-order path for a weak-agent task.
+10. Run the eval.
+11. Generalize only the pieces that improve metrics.
 
 Smoke evals can run earlier to catch obvious product friction. The success
 claim waits until taught failures, escape-hatch accounting, a factory check,
