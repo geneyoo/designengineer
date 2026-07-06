@@ -10,7 +10,7 @@ The senior→junior handoff should be a machine-readable contract, not a chat
 message:
 
 ```yaml
-# .agent-harness/workorders/invoices-empty-state.yaml
+# .designengineer/workorders/invoices-empty-state.yaml
 task: Add empty state to invoices list
 scope:
   allow: [apps/ios/Palette/Features/Invoices/**]
@@ -23,7 +23,7 @@ done:
 ```
 
 Enforcement: a PreToolUse hook denies edits outside `scope.allow`; a Stop
-hook runs `agent-harness assert` for every `done` entry. "Done" is not a
+hook runs `designengineer assert` for every `done` entry. "Done" is not a
 claim, it is ledger state matching the contract.
 
 Why it matters: weak agents fail by wandering. Scope fences plus a named
@@ -59,7 +59,7 @@ remediation messages.
 If exemplars are the paved road, they must be findable and pristine.
 
 - Mark them: `// exemplar: list-row` (Swift), `/* exemplar: form */` (TS).
-- Index them: `agent-harness exemplars [kind]` returns paths; work orders
+- Index them: `designengineer exemplars [kind]` returns paths; work orders
   reference them by kind, not path.
 - Keep them pristine: a check requires every exemplar file to pass all
   ERROR-tier checks with zero escape hatches. A rotting exemplar is worse
@@ -76,11 +76,11 @@ entry records which rules fired. Over time:
 - A rule that never fires is dead weight — delete it (instruction budget is
   real even for checks: runtime, noise, maintenance).
 - A rule that fires constantly is a signal the paved road is missing — this
-  is the trigger for investing in a generator or better exemplar, replacing
-  guesswork with data. It is the standing answer to "when do generators
-  earn their keep."
+  is the trigger for investing in a factory, better exemplar, or only then a
+  scaffold generator. That replaces guesswork with data and answers when
+  generation earns its keep.
 
-Enforcement: `agent-harness report rules` over ledger history; a quarterly
+Enforcement: `designengineer report rules` over ledger history; a quarterly
 prune is a documented maintenance verb.
 
 ## 5. Progressive trust: moveset width scales with agent tier

@@ -35,7 +35,7 @@ Weak agents should not need taste. They should have a small legal move set.
 This repo will track research and prototypes around:
 
 - Design-system enforcement for agent-generated UI.
-- CLI generators and exemplar-driven workflows for paved-road product and
+- CLI factories and exemplar-driven workflows for paved-road product and
   engineering work.
 - Hooks that block architectural drift.
 - Local `AGENTS.md` files that make repo rules discoverable.
@@ -43,6 +43,8 @@ This repo will track research and prototypes around:
 - Checkers that turn subjective review into mechanical feedback.
 - A verification ledger that records what actually passed, against which tree.
 - Escape-hatch accounting as a drift metric.
+- Quality-controlled factories for tokens, icons, snapshots, screenshots, and
+  other generated artifacts.
 
 ## Existing Tools To Build Around
 
@@ -63,24 +65,33 @@ hatches.
 
 ## Working Product Idea
 
-Working name: **Agent Rails** or **Repo Harness**.
+Working product: **Design Engineer Harness**.
 
 Example interface:
 
 ```bash
-agent-harness init
-agent-harness scan
-agent-harness check changed
-agent-harness check architecture
-agent-harness verify ios-verify
-agent-harness status
-agent-harness assert ios-verify
-agent-harness explain-rules
+designengineer init
+designengineer scan
+designengineer check changed
+designengineer check architecture
+designengineer verify ios-verify
+designengineer status
+designengineer assert ios-verify
+designengineer factory list
+designengineer factory run tokens
+designengineer factory check tokens
+designengineer factory preview ios-design-gallery
+designengineer explain-rules
 ```
 
-Generator commands such as `agent-harness make component UserMenu` remain a
+Generator commands such as `designengineer make component UserMenu` remain a
 hypothesis. They should follow evidence that exemplars plus checks are not
 enough.
+
+Factories are the narrower proven version of generation: source of truth,
+deterministic output, preview surface, and drift check. Existing token, icon,
+design-gallery, and screenshot generators in local repos should be extracted
+as factories before inventing broad scaffolding.
 
 Example config:
 
@@ -115,9 +126,11 @@ backend:
    and `prettyplease`.
 2. Prototype a local verification ledger on top of an existing repo's
    `make *-verify` targets.
-3. Count escape hatches such as `design-ok:` and report them as drift.
-4. Stand up an agentic eval: same tasks, weak model, with and without rails.
-5. Revisit generators only after the eval shows where exemplars plus checks
+3. Register one existing token or design-gallery workflow as a factory with a
+   run command, preview path, check command, and ledger entry.
+4. Count escape hatches such as `design-ok:` and report them as drift.
+5. Stand up an agentic eval: same tasks, weak model, with and without rails.
+6. Revisit broad generators only after the eval shows where exemplars plus checks
    fall short.
 
 The build and validation details live in `docs/validation-plan.md`.

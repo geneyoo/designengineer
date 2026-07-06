@@ -82,42 +82,51 @@ The missing thing is:
 A repo harness compiler for agents.
 ```
 
-Working name: **Agent Rails** or **Repo Harness**.
+Working product: **Design Engineer Harness**.
 
 It would generate and enforce project-specific rails:
 
 ```bash
-agent-harness init
-agent-harness scan
-agent-harness check changed
-agent-harness check architecture
-agent-harness verify ios-verify
-agent-harness status
-agent-harness assert ios-verify
-agent-harness explain-rules
+designengineer init
+designengineer scan
+designengineer check changed
+designengineer check architecture
+designengineer verify ios-verify
+designengineer status
+designengineer assert ios-verify
+designengineer factory list
+designengineer factory run tokens
+designengineer factory check tokens
+designengineer factory preview ios-design-gallery
+designengineer explain-rules
 ```
 
-Generator commands such as `agent-harness make component UserMenu` are not yet
+Generator commands such as `designengineer make component UserMenu` are not yet
 proven. The local repos do not contain them. The honest claim is weaker and
 more testable: exemplars plus checks may deliver most of the value; generators
 should be added only when evals show repeated failures that scaffolding would
 prevent.
+
+Quality-controlled factories are different. Local repos already have evidence
+for token, icon, design-gallery, and screenshot factories: they combine a
+source of truth, deterministic output, preview surface, and drift check. Those
+should be extracted before inventing generic scaffolds.
 
 The plugin layer should be thin:
 
 ```text
 skills/
   architecture-workorder
-  create-generator
+  use-factory
   add-guardrail
   fix-guardrail-failure
 
 hooks/
-  post-edit: agent-harness check changed
-  pre-commit: agent-harness check staged
+  post-edit: designengineer check changed
+  pre-commit: designengineer check staged
 ```
 
-The library layer should be thick: AST checks, import rules, generators, config
+The library layer should be thick: AST checks, import rules, factories, config
 schema, examples.
 
 ## Verification Ledger

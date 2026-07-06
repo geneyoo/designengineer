@@ -6,12 +6,12 @@ record. "Evidence before done" only works if evidence is a queryable artifact.
 ## Shape
 
 ```bash
-agent-harness verify <check> [--scope changed]   # run check, append record
-agent-harness status                             # what's fresh, stale, missing
-agent-harness assert <check>                     # exit 0 iff fresh evidence exists
+designengineer verify <check> [--scope changed]   # run check, append record
+designengineer status                             # what's fresh, stale, missing
+designengineer assert <check>                     # exit 0 iff fresh evidence exists
 ```
 
-Ledger: `.agent-harness/ledger.jsonl` (gitignored; CI always re-verifies).
+Ledger: `.designengineer/ledger.jsonl` (gitignored; CI always re-verifies).
 
 ```json
 {"check":"ios-verify","tree":"<git tree hash of lane files>",
@@ -43,7 +43,7 @@ has not elapsed (when set).
 ## Why this matters for weak agents specifically
 
 1. **"Done" becomes checkable.** A Stop/pre-commit hook runs
-   `agent-harness assert` for the checks the task's work order names. A weak
+   `designengineer assert` for the checks the task's work order names. A weak
    agent cannot claim done without fresh ledger entries — the claim is
    mechanical, not trusted.
 2. **Expensive checks stop re-running.** Agent asks `status` before spending

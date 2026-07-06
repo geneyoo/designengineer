@@ -6,8 +6,8 @@ This repo is about making agent behavior executable, not merely instructive.
 
 - Prefer small, reviewable documents and prototypes over broad frameworks.
 - Preserve the distinction between capability tools and preference prompts.
-- Treat hooks, CLI generators, schemas, lint rules, and tests as first-class
-  design artifacts.
+- Treat hooks, quality-controlled factories, schemas, lint rules, and tests as
+  first-class design artifacts.
 - Prefer extracting and generalizing working checks from local repos before
   inventing new mechanisms.
 - When adding a proposed rule, include how it would be enforced.
@@ -26,8 +26,8 @@ systems, frontend craft, architecture, and practical automation.
 The repo should favor:
 
 - Design-system enforcement over generic frontend advice.
-- Checks and exemplars before generators; generators only when they remove a
-  measured repeated failure.
+- Checks, exemplars, and factories before broad scaffold generators; scaffold
+  generators only when they remove a measured repeated failure.
 - Checks over reminders.
 - Local repo contracts over global agent personality.
 - Evidence and verification over claims.
@@ -40,6 +40,8 @@ The repo should favor:
 - `docs/research/README.md`: research queue and evaluation template.
 - `docs/research/reuse-map.md`: local prior art to extract.
 - `docs/research/verification-ledger.md`: evidence model for local verification.
+- `docs/research/factory-patterns.md`: generated-output patterns with baked-in
+  quality control.
 
 ## Done Means
 

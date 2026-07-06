@@ -18,7 +18,7 @@ machinery sits unextracted next door. Extract, don't invent.
   model with `// design-ok: <reason>` escape hatch and a cross-target
   palette-parity check (shield extension hexes must exist in Colors.swift).
 
-Generalization target: `agent-harness check design` driven by config, with
+Generalization target: `designengineer check design` driven by config, with
 the ERROR/WARN split and named escape hatches from prettyplease.
 
 ### 2. Token generator with drift check
@@ -30,13 +30,16 @@ the ERROR/WARN split and named escape hatches from prettyplease.
 This is the "compile judgment into artifacts" pattern working end to end:
 markdown source of truth → generated code → drift gate.
 
+Better label: token factory. It has a source of truth, generated outputs, and
+a freshness check.
+
 ### 3. Lane dispatch (change-scoped verification)
 
 - `~/palette/tools/lanes/detect.sh` + `dispatch.sh`: map changed files to a
   lane (ios/server/www), dispatch verify/lint/build/test to just that lane.
 - `.githooks/pre-commit` + `pre-push` in both repos consume it.
 
-This is the substrate for `agent-harness check changed` and for the
+This is the substrate for `designengineer check changed` and for the
 verification ledger (see `verification-ledger.md`).
 
 ### 4. Gallery-catalog enforcement
@@ -53,6 +56,25 @@ claim, already enforced mechanically.
   `make *-verify` gates. prettyplease has no CI; hooks-only enforcement dies
   on `--no-verify`.
 
+### 6. Quality-controlled factories
+
+- `~/palette/scripts/ios/design-system-gallery.sh`: simulator-backed design
+  system gallery render that writes
+  `build/ios-design-system-gallery/index.html` and component images.
+- `~/palette/scripts/ios/generate-app-icons.sh`: validates a square source
+  image, generates AppIcon sizes, hero assets, and asset-catalog metadata.
+- `~/prettyplease/scripts/ios/render-brand-assets.sh`: renders iOS/web brand
+  assets from a single brand definition.
+- `~/prettyplease/PrettyPleaseTests/PrettyIconVisualGeometryTests.swift`:
+  rasterizes the app icon and checks geometry so icon regressions are
+  mechanical failures.
+- `~/prettyplease/scripts/marketing/appshot`: config-driven App Store
+  screenshot renderer.
+
+Generalization target: `designengineer factory *`, not a generic scaffold
+generator. The harness should declare each factory's source, outputs, run
+command, check command, preview path, and ledger invalidation mode.
+
 ## What NOT to carry over
 
 - `~/prettyplease/CLAUDE.md` (362 lines of prose rules) is the anti-pattern
@@ -65,12 +87,13 @@ claim, already enforced mechanically.
 
 - No scaffold generators (`make component` does not exist anywhere). The
   "CLI verbs → generated structure" leg of the thesis has zero prior art in
-  our own repos. See open question in README critique.
+  our own repos. The proven local pattern is narrower: quality-controlled
+  factories for tokens, icons, galleries, and screenshots.
 - No import/architecture boundary checks (buy: dependency-cruiser or
   eslint-plugin-boundaries for TS; SwiftLint custom rules → SwiftSyntax for
   real Swift AST).
 - No escape-hatch accounting: `design-ok:` markers accumulate silently.
-  `agent-harness check drift` should count and report them.
+  `designengineer check drift` should count and report them.
 - No measurement. See eval note below.
 
 ## Eval requirement (the ponytail lesson)

@@ -17,6 +17,10 @@ designengineer status
 designengineer assert <check>
 designengineer workorder create
 designengineer exemplars list [kind]
+designengineer factory list
+designengineer factory run <factory>
+designengineer factory check <factory>
+designengineer factory preview <factory>
 designengineer report rules
 ```
 
@@ -93,6 +97,44 @@ V0 should prove value inside `palette` before becoming generic.
    - ledger records fired rule IDs
    - report hot rules, dead rules, and escape-hatch count
 
+5. Register one quality-controlled factory:
+   - declare source of truth
+   - declare generated outputs
+   - run existing generator command
+   - run existing freshness check
+   - expose preview path
+   - append ledger evidence
+
+## Factory Contract
+
+Factories are generated workflows with quality control, not broad scaffolding
+promises.
+
+```yaml
+factories:
+  ios-design-gallery:
+    source:
+      - apps/ios/Palette/UI/DesignSystem/Gallery/PaletteDesignSystemCatalog.swift
+    run: scripts/ios/design-system-gallery.sh
+    check: make design-system-docs-check
+    preview: build/ios-design-system-gallery/index.html
+    outputs:
+      - build/ios-design-system-gallery/
+    ledger:
+      invalidation: tree-hash
+```
+
+A factory should have:
+
+- one source of truth
+- deterministic output
+- a drift or freshness check
+- a preview surface
+- ledger evidence
+
+Screenshot and approval-heavy factories can use TTL invalidation for the human
+approval record, but deterministic renders should still be tree-hash keyed.
+
 ## Ledger Schema
 
 Record rule IDs immediately, even before reporting exists.
@@ -133,6 +175,8 @@ Task set:
 - add a list row variant
 - add a small settings control
 - make a tokenized color/style change
+- update a generated token or gallery factory
+- render an app screenshot or icon factory
 - fix a known design-system violation
 
 Measure:
@@ -147,6 +191,8 @@ Measure:
 - rule fire count
 - elapsed check time
 - flaky-rule count
+- factory freshness rate
+- manual cleanup required after factory run
 
 Success criteria:
 
@@ -169,9 +215,10 @@ Failure criteria:
 1. Build ledger v0 in `palette`.
 2. Add taught failures to one design-system check.
 3. Add escape-hatch counting.
-4. Add one work-order path for a weak-agent task.
-5. Run the eval.
-6. Generalize only the pieces that improve metrics.
+4. Register one existing `palette` factory.
+5. Add one work-order path for a weak-agent task.
+6. Run the eval.
+7. Generalize only the pieces that improve metrics.
 
 Generators stay deferred until telemetry shows a repeated rule failure that an
 exemplar cannot prevent.
