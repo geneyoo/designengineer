@@ -21,7 +21,7 @@ machinery sits unextracted next door. Extract, don't invent.
 Generalization target: `designengineer check design` driven by config, with
 the ERROR/WARN split and named escape hatches from prettyplease.
 
-### 2. Token generator with drift check
+### 2. Token factory candidate with drift check
 
 - `~/palette/scripts/www/build-tokens.mjs` (433 lines, zero-dep): parses
   `themes/*.md` markdown tables → generates `tokens.css`/`tokens.ts`;
@@ -30,8 +30,9 @@ the ERROR/WARN split and named escape hatches from prettyplease.
 This is the "compile judgment into artifacts" pattern working end to end:
 markdown source of truth → generated code → drift gate.
 
-Better label: token factory. It has a source of truth, generated outputs, and
-a freshness check.
+Better label: token factory candidate. It has a source of truth, generated
+outputs, and a freshness check. It needs a declared preview path before the
+repo should call it a full factory.
 
 ### 3. Lane dispatch (change-scoped verification)
 
@@ -73,7 +74,9 @@ claim, already enforced mechanically.
 
 Generalization target: `designengineer factory *`, not a generic scaffold
 generator. The harness should declare each factory's source, outputs, run
-command, check command, preview path, and ledger invalidation mode.
+command, check command, preview path, and ledger invalidation mode. Factory
+checks should use check IDs such as `factory.web-tokens` and write the same
+ledger entries as `designengineer verify`.
 
 ## What NOT to carry over
 

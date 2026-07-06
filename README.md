@@ -75,14 +75,18 @@ designengineer scan
 designengineer check changed
 designengineer check architecture
 designengineer verify ios-verify
+designengineer verify factory.web-tokens
 designengineer status
 designengineer assert ios-verify
 designengineer factory list
-designengineer factory run tokens
-designengineer factory check tokens
+designengineer factory run web-tokens
+designengineer factory check web-tokens
 designengineer factory preview ios-design-gallery
 designengineer explain-rules
 ```
+
+`designengineer factory check <id>` is sugar for `designengineer verify
+factory.<id>`. There is one evidence path: the verification ledger.
 
 Generator commands such as `designengineer make component UserMenu` remain a
 hypothesis. They should follow evidence that exemplars plus checks are not
@@ -96,44 +100,36 @@ as factories before inventing broad scaffolding.
 Example config:
 
 ```yaml
-ui:
-  designSystem: src/design-system
-  forbidRawElements:
-    - button
-    - input
-  forbidInlineColors: true
+checks:
+  ios-design:
+    command: make ios-design-system-check
+    rules:
+      - ios-design.raw-color
+      - ios-design.raw-font
 
-architecture:
-  boundaries:
-    - from: src/features/*
-      disallowImports:
-        - src/app/*
-        - src/db/raw/*
-
-backend:
-  envSchema: src/env/schema.ts
-  requireIdempotencyForJobs: true
-  requireTestsFor:
-    - parsers
-    - money
-    - auth
-    - migrations
+factories:
+  web-tokens:
+    source:
+      - themes/*.instructions.md
+    run: make www-tokens-build
+    check: make www-tokens-check
+    verify: factory.web-tokens
+    outputs:
+      - www/src/ui/tokens.css
+      - www/src/ui/tokens.ts
+    preview:
+      status: missing
+      candidate: web style guide or token dashboard
+    ledger:
+      invalidation: tree-hash
 ```
 
-## First Sequence
+## Build Sequence
 
-1. Extract the design-system checks and lane dispatch patterns from `palette`
-   and `prettyplease`.
-2. Prototype a local verification ledger on top of an existing repo's
-   `make *-verify` targets.
-3. Register one existing token or design-gallery workflow as a factory with a
-   run command, preview path, check command, and ledger entry.
-4. Count escape hatches such as `design-ok:` and report them as drift.
-5. Stand up an agentic eval: same tasks, weak model, with and without rails.
-6. Revisit broad generators only after the eval shows where exemplars plus checks
-   fall short.
-
-The build and validation details live in `docs/validation-plan.md`.
+The canonical sequence lives in `docs/validation-plan.md`. README should only
+state the product bias: prove the harness in `palette`, register the fast
+web-token factory candidate first, add taught failures and work orders before
+claiming eval success, then generalize only pieces that improve metrics.
 
 ## Position
 

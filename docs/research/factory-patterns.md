@@ -18,7 +18,7 @@ the generated output also has a cheap way to inspect, verify, and reject drift.
 
 ## Factory Test
 
-A generator qualifies as a factory only when it has:
+A generator qualifies as a full factory only when it has:
 
 - Source of truth: one declared place the human edits.
 - Deterministic output: generated files are reproducible.
@@ -28,13 +28,16 @@ A generator qualifies as a factory only when it has:
   human can inspect quickly.
 - Quality gate: a check that can fail with a fix and exemplar.
 - Ledger record: the harness can record that the factory output is fresh for a
-  tree hash, or approved under a TTL when human taste is involved.
+  tree hash, a tree hash plus environment fingerprint when rendering depends
+  on runtime, or approved under a TTL when human taste is involved.
 
-If any of those are missing, call it a generator and treat it as unproven.
+If any of those are missing, call it a factory candidate and make
+`factory status` show the missing criterion. Do not call it a proven factory
+until all criteria are satisfied.
 
 ## Local Prior Art
 
-### Palette Token Factory
+### Palette Web Tokens: First Factory Candidate
 
 Source of truth:
 
@@ -55,11 +58,16 @@ Quality control:
 - `make www-tokens-check` catches drift
 - token tests ensure the generated artifacts stay coherent
 
+Current gap:
+
+- no dedicated preview surface is documented with the token converter itself
+
 Product lesson:
 
-This is a complete "compile design judgment into code" loop. The markdown
-source is human-editable; the outputs are agent-usable; the check prevents
-stale generated artifacts.
+This is the right first implementation target because it is fast, deterministic,
+zero-dependency, and already has a drift check. It is still a factory candidate
+until it is linked to a preview surface, such as a web style guide, token
+dashboard, or generated token panel.
 
 ### Palette Design-System Gallery Factory
 
@@ -83,12 +91,15 @@ Quality control:
   `PaletteDesignSystemGallerySnapshotTests`
 - catalog registration is enforced by the design-system check
 - docs drift can be checked through the design-system docs target
+- ledger freshness must include an environment fingerprint, not only a tree
+  hash, because Xcode and simulator runtime changes affect renders
 
 Product lesson:
 
 The gallery turns "use the design system" from prose into a visible inventory
 of legal moves. Weak agents can copy the catalog; humans can review the
-rendered result.
+rendered result. It is the more design-specific factory, but it should be the
+second factory after web tokens because its invalidation model is harder.
 
 ### Palette App Icon Factory
 
@@ -179,11 +190,15 @@ Design Engineer Harness should treat factories as a first-class primitive:
 
 ```bash
 designengineer factory list
-designengineer factory run tokens
-designengineer factory check tokens
+designengineer factory run web-tokens
+designengineer factory check web-tokens
 designengineer factory preview design-system
 designengineer factory status
+designengineer verify factory.web-tokens
 ```
+
+`factory check <id>` is an alias for `verify factory.<id>`. Factories must not
+create a parallel verification system.
 
 The harness should not assume every repo needs scaffolding generators. It
 should discover or declare factories that already exist, then standardize:
@@ -210,6 +225,7 @@ Measures:
 - did the preview exist in the expected location
 - did the ledger record fresh evidence
 - did any generated artifact require manual cleanup
+- did `factory check` use the same ledger/assert/status path as `verify`
 
 The bar is not "can an agent make assets." The bar is "can a weak agent use
 the factory without knowing the asset rules."

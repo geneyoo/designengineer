@@ -95,8 +95,9 @@ designengineer verify ios-verify
 designengineer status
 designengineer assert ios-verify
 designengineer factory list
-designengineer factory run tokens
-designengineer factory check tokens
+designengineer factory run web-tokens
+designengineer factory check web-tokens
+designengineer verify factory.web-tokens
 designengineer factory preview ios-design-gallery
 designengineer explain-rules
 ```
@@ -133,9 +134,10 @@ schema, examples.
 
 "Evidence before done" needs a local artifact, not a transcript claim.
 Deterministic checks should be invalidated by input hash, not time;
-environment-coupled checks should use TTLs because the world changes
-underneath them. Weak agents benefit because "done" becomes mechanical: a hook
-or reviewer can ask what passed against the current tree. The mechanics live in
+simulator and browser renders need environment fingerprints; world-coupled
+checks and human approvals should use TTLs because the world changes underneath
+them. Weak agents benefit because "done" becomes mechanical: a hook or reviewer
+can ask what passed against the current tree. The mechanics live in
 `docs/research/verification-ledger.md`.
 
 ## Measurement Requirement
@@ -172,7 +174,7 @@ Good agent UI happens when the repo only permits:
 - design tokens
 - approved layout primitives
 - typed component variants
-- generated page scaffolds
+- factories and exemplars
 - accessibility checks
 - visual regression checks
 
@@ -180,8 +182,8 @@ The same pattern applies outside UI. Architecture is also a design system.
 
 ## Immediate Roadmap
 
-The execution sequence is owned by `README.md` under "First Sequence" so this
-argument and the implementation plan do not drift apart.
+The execution sequence is owned by `docs/validation-plan.md` so this argument
+and the implementation plan do not drift apart.
 
 ## Final Opinion
 
