@@ -22,6 +22,8 @@ designengineer factory list
 designengineer factory run <factory>
 designengineer factory check <factory>      # alias for verify factory.<factory>
 designengineer factory preview <factory>
+designengineer add-rulepack <id> --check <command>
+designengineer verify rulepack.<id>
 designengineer report rules
 ```
 
@@ -92,17 +94,23 @@ V0 should prove value inside `palette` before becoming generic.
    - include `fix:` and `exemplar:` fields in failures
    - count `design-ok:` escape hatches
 
-3. Add lightweight work orders:
+3. Register rulepack candidates:
+   - wrap existing copy-style and design-system scripts
+   - record stable rule IDs such as `copy.no-em-dash`
+   - preserve existing Makefile and hook entry points
+   - send output through the same ledger as other checks
+
+4. Add lightweight work orders:
    - `scope.allow`
    - `max-files`
    - `exemplar`
    - `done` checks
 
-4. Add rule telemetry:
+5. Add rule telemetry:
    - ledger records fired rule IDs
    - report hot rules, dead rules, and escape-hatch count
 
-5. Register the first factory candidate:
+6. Register the first factory candidate:
    - declare source of truth
    - declare generated outputs
    - run existing generator command
@@ -231,13 +239,15 @@ Failure criteria:
 
 1. Build ledger v0 in `palette`.
 2. Add taught failures to one design-system check.
-3. Add escape-hatch counting.
-4. Register `web-tokens` as the first factory candidate.
-5. Wire `factory check web-tokens` to `verify factory.web-tokens`.
-6. Add or declare the missing token preview path.
-7. Add one work-order path for a weak-agent task.
-8. Run the eval.
-9. Generalize only the pieces that improve metrics.
+3. Register one fast rulepack candidate, starting with an existing
+   design-system or copy-style script.
+4. Add escape-hatch counting.
+5. Register `web-tokens` as the first factory candidate.
+6. Wire `factory check web-tokens` to `verify factory.web-tokens`.
+7. Add or declare the missing token preview path.
+8. Add one work-order path for a weak-agent task.
+9. Run the eval.
+10. Generalize only the pieces that improve metrics.
 
 Smoke evals can run earlier to catch obvious product friction. The success
 claim waits until taught failures, escape-hatch accounting, a factory check,

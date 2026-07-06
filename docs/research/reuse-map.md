@@ -1,12 +1,12 @@
-# Reuse Map: palette and prettyplease
+# Reuse Map: palette, shaba, and prettyplease
 
-Both repos already contain embryonic versions of the harness. The risk for
+These repos already contain embryonic versions of the harness. The risk for
 this repo is not ideation; it is staying a thesis repo while the working
 machinery sits unextracted next door. Extract, don't invent.
 
 ## Highest-value extractions (in order)
 
-### 1. Design-system checks (the proven core)
+### 1. Design-system and taste checks (the proven core)
 
 - `~/palette/scripts/ios/design-system-check.sh` (167 lines, rg+awk):
   bans raw SwiftUI fonts/colors/radii/materials/Button/List, forces
@@ -17,9 +17,15 @@ machinery sits unextracted next door. Extract, don't invent.
 - `~/prettyplease/scripts/ios/design-system-check.sh`: two-tier ERROR/WARN
   model with `// design-ok: <reason>` escape hatch and a cross-target
   palette-parity check (shield extension hexes must exist in Colors.swift).
+- `~/shaba/scripts/ios/design-system-check.sh`: compact PrettyPlease-derived
+  design-system check for colors, system hues, fonts, and radii.
+- `~/shaba/scripts/ios/no-em-dash-check.sh`: a tiny copy-style guard wired
+  into `.githooks/pre-commit` and `make lint`.
 
 Generalization target: `designengineer check design` driven by config, with
-the ERROR/WARN split and named escape hatches from prettyplease.
+the ERROR/WARN split and named escape hatches from prettyplease. Better
+generalization target: `designengineer verify rulepack.<id>`, where design,
+copy, architecture, and asset-style rules use the same contract.
 
 ### 2. Token factory candidate with drift check
 
@@ -71,6 +77,9 @@ claim, already enforced mechanically.
   mechanical failures.
 - `~/prettyplease/scripts/marketing/appshot`: config-driven App Store
   screenshot renderer.
+- `~/palette/themes/*.instructions.md`: Palette's style formula for future
+  colors, fonts, common UI elements, and asset treatment. This is source
+  material for token and asset factories, not prose to keep in agent memory.
 
 Generalization target: `designengineer factory *`, not a generic scaffold
 generator. The harness should declare each factory's source, outputs, run

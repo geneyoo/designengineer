@@ -41,6 +41,8 @@ This repo will track research and prototypes around:
 - Local `AGENTS.md` files that make repo rules discoverable.
 - Skills/plugins that encode design-engineer workflows.
 - Checkers that turn subjective review into mechanical feedback.
+- Rulepacks that wrap repo-specific taste checks like copy style,
+  design-system usage, and asset style formulas.
 - A verification ledger that records what actually passed, against which tree.
 - Escape-hatch accounting as a drift metric.
 - Quality-controlled factories for tokens, icons, snapshots, screenshots, and
@@ -58,10 +60,10 @@ These tools appear complementary rather than direct substitutes:
 The missing layer is repo-specific executable architecture.
 
 This repo should extract from working local prior art before inventing new
-systems. `palette` and `prettyplease` already contain early versions of the
-core idea: design-system checks, token drift gates, change-scoped verification
-lanes, hook wiring, warning/error tiers, and explicit `design-ok:` escape
-hatches.
+systems. `palette`, `shaba`, and `prettyplease` already contain early versions
+of the core idea: design-system checks, copy-style gates, token drift gates,
+asset style formulas, change-scoped verification lanes, hook wiring,
+warning/error tiers, and explicit escape hatches.
 
 ## Working Product Idea
 
@@ -82,6 +84,8 @@ designengineer factory list
 designengineer factory run web-tokens
 designengineer factory check web-tokens
 designengineer factory preview ios-design-gallery
+designengineer add-rulepack copy-style --check "make lint"
+designengineer verify rulepack.copy-style
 designengineer explain-rules
 ```
 

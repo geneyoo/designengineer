@@ -23,7 +23,9 @@ Decision:
 ## Initial Queue
 
 - Local prior art: `palette`
+- Local prior art: `shaba`
 - Local prior art: `prettyplease`
+- Rulepack extraction
 - Moveset extensions
 - Factory patterns
 - Context7
@@ -49,3 +51,5 @@ working machinery out of local repos first.
 See `../validation-plan.md` for the current build sequence and eval criteria.
 See `factory-patterns.md` for the narrower generator claim that has local
 evidence.
+See `rulepacks.md` for the lightweight way to normalize repo-specific taste
+checks without replacing existing scripts.

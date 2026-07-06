@@ -69,6 +69,12 @@ zero-dependency, and already has a drift check. It is still a factory candidate
 until it is linked to a preview surface, such as a web style guide, token
 dashboard, or generated token panel.
 
+Palette also shows the broader factory input pattern: the `themes/*.instructions.md`
+files are not just agent prose. They are a style formula for future colors,
+fonts, UI elements, and assets. A strong asset factory should consume that
+formula as source material, render the asset outputs, expose a preview, and
+let rulepacks reject outputs that ignore the declared style.
+
 ### Palette Design-System Gallery Factory
 
 Source of truth:

@@ -42,6 +42,8 @@ The repo should favor:
 - `docs/research/verification-ledger.md`: evidence model for local verification.
 - `docs/research/factory-patterns.md`: generated-output patterns with baked-in
   quality control.
+- `docs/research/rulepacks.md`: taste, design-system, copy, and asset-style
+  checks normalized into reusable repo-local contracts.
 
 ## Done Means
 
