@@ -120,6 +120,8 @@ backend:
 5. Revisit generators only after the eval shows where exemplars plus checks
    fall short.
 
+The build and validation details live in `docs/validation-plan.md`.
+
 ## Position
 
 Use stock agents by default. Add capability tools when they provide facts,

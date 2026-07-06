@@ -24,6 +24,7 @@ Decision:
 
 - Local prior art: `palette`
 - Local prior art: `prettyplease`
+- Moveset extensions
 - Context7
 - Superpowers
 - Anthropic LSP plugins
@@ -43,3 +44,5 @@ checks, hooks, verification evidence, and, when proven necessary, generators.
 
 The current bias is extraction over invention: prove the harness by lifting
 working machinery out of local repos first.
+
+See `../validation-plan.md` for the current build sequence and eval criteria.

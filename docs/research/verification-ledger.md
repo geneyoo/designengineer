@@ -15,10 +15,14 @@ Ledger: `.agent-harness/ledger.jsonl` (gitignored; CI always re-verifies).
 
 ```json
 {"check":"ios-verify","tree":"<git tree hash of lane files>",
- "result":"pass","at":"2026-07-06T18:40:00Z","ttl":null}
+ "result":"pass","rules":[],"at":"2026-07-06T18:40:00Z","ttl":null}
 {"check":"staging-smoke","tree":null,
- "result":"pass","at":"2026-07-06T18:41:00Z","ttl":"4h"}
+ "result":"pass","rules":[],"at":"2026-07-06T18:41:00Z","ttl":"4h"}
 ```
+
+Record `rules` from day one, even before reporting exists. Rule telemetry
+depends on this field and retrofitting it later would create needless schema
+drift.
 
 ## Invalidation: hash for code, TTL for the world
 
