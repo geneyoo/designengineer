@@ -91,9 +91,9 @@ agent-harness init
 agent-harness scan
 agent-harness check changed
 agent-harness check architecture
-agent-harness verify ios-design
+agent-harness verify ios-verify
 agent-harness status
-agent-harness assert ios-design
+agent-harness assert ios-verify
 agent-harness explain-rules
 ```
 
@@ -123,30 +123,11 @@ schema, examples.
 ## Verification Ledger
 
 "Evidence before done" needs a local artifact, not a transcript claim.
-
-Proposed primitive:
-
-```bash
-agent-harness verify <check> [--scope changed]
-agent-harness status
-agent-harness assert <check>
-```
-
-Each verify run appends to a local `.agent-harness/ledger.jsonl`:
-
-```json
-{"check":"ios-verify","tree":"<hash>","result":"pass","at":"2026-07-06T18:40:00Z","ttl":null}
-{"check":"staging-smoke","tree":null,"result":"pass","at":"2026-07-06T18:41:00Z","ttl":"4h"}
-```
-
-Deterministic checks should be invalidated by input hash, not time. Lint,
-build, typecheck, and unit-test results decay with edits. Environment-coupled
-checks should use TTLs because the world changes underneath them: staging
-smoke, device runs, screenshot approval, dependency audits, and external API
-contracts.
-
-Weak agents benefit because "done" becomes mechanical. A hook or reviewer can
-ask the ledger what passed against the current tree.
+Deterministic checks should be invalidated by input hash, not time;
+environment-coupled checks should use TTLs because the world changes
+underneath them. Weak agents benefit because "done" becomes mechanical: a hook
+or reviewer can ask what passed against the current tree. The mechanics live in
+`docs/research/verification-ledger.md`.
 
 ## Measurement Requirement
 
@@ -190,12 +171,8 @@ The same pattern applies outside UI. Architecture is also a design system.
 
 ## Immediate Roadmap
 
-1. Extract `palette` and `prettyplease` design checks into a generic harness
-   prototype.
-2. Extract `palette` lane dispatch into `agent-harness check changed`.
-3. Build the verification ledger against existing `make *-verify` targets.
-4. Add escape-hatch counting.
-5. Run an eval before adding generators or publishing plugin claims.
+The execution sequence is owned by `README.md` under "First Sequence" so this
+argument and the implementation plan do not drift apart.
 
 ## Final Opinion
 

@@ -1,4 +1,4 @@
-# Verification Ledger: local verify + logged evidence with TTLs
+# Verification Ledger: local verify + hash/TTL evidence
 
 Proposed harness primitive: checks don't just pass or fail — they leave a
 record. "Evidence before done" only works if evidence is a queryable artifact.

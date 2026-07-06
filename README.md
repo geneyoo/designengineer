@@ -72,9 +72,9 @@ agent-harness init
 agent-harness scan
 agent-harness check changed
 agent-harness check architecture
-agent-harness verify ios-design
+agent-harness verify ios-verify
 agent-harness status
-agent-harness assert ios-design
+agent-harness assert ios-verify
 agent-harness explain-rules
 ```
 
