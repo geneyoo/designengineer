@@ -32,7 +32,7 @@ Minimal required secrets for a Shaba-like Node server are:
 - RENDER_API_KEY
 - AUTH_CODE_PEPPER
 - RESEND_API_KEY
-- OPENAI_API_KEY or OPENAPI_KEY if this app uses OpenAI image generation
+- OPENAI_API_KEY if this app uses OpenAI image generation
 
 Optional defaults should stay in code or comments unless the app really needs
 to override them:
@@ -101,7 +101,7 @@ bootstrap reference:
 
 - `render.yaml`: API service, gen-art worker, and Postgres in one Blueprint.
 - `scripts/server/render-bootstrap.sh`: creates/updates infra and env vars via
-  Render API, loads `server/.env`, maps `OPENAPI_KEY` to `OPENAI_API_KEY`.
+  Render API, loads `server/.env`.
 - `server/.env.example`: minimal required bootstrap field plus optional
   defaults as comments.
 
@@ -143,10 +143,10 @@ find "$HOME/palette" "$HOME/prettyplease" "$HOME/.config" -maxdepth 5 \
   -type f \( -name ".env" -o -name ".env.*" -o -name "*.env" -o -name "render.env" \) \
   -print 2>/dev/null |
 while IFS= read -r file; do
-  if rg -q '^(RENDER_API_KEY|RESEND_API_KEY|AUTH_CODE_PEPPER|OPENAI_API_KEY|OPENAPI_KEY|CLOUDFLARE_|CF_)=' "$file"; then
+  if rg -q '^(RENDER_API_KEY|RESEND_API_KEY|AUTH_CODE_PEPPER|OPENAI_API_KEY|CLOUDFLARE_|CF_)=' "$file"; then
     printf '%s\n' "$file"
     redacted_env_status "$file" |
-      rg ' (RENDER_API_KEY|RESEND_API_KEY|AUTH_CODE_PEPPER|OPENAI_API_KEY|OPENAPI_KEY|CLOUDFLARE_|CF_) '
+      rg ' (RENDER_API_KEY|RESEND_API_KEY|AUTH_CODE_PEPPER|OPENAI_API_KEY|CLOUDFLARE_|CF_) '
   fi
 done
 ```
