@@ -74,8 +74,11 @@ codesign -d --entitlements - build/App.xcarchive/Products/Applications/App.app
 - [ ] The ASC app-list icon appears only after a build with a valid 1024px app icon is uploaded and processed; creating the ASC record alone shows a placeholder.
 - [ ] Wait for processing in ASC TestFlight.
 - [ ] If status is `Missing Compliance`, answer/export compliance before testing.
-- [ ] When status is `Ready to Submit` or `Testing`, add the build to internal testers.
-- [ ] External testers require TestFlight App Review for the first build in a group.
+- [ ] For internal testing, create an internal group, add the build, and invite App Store Connect users.
+- [ ] Before external testing, fill TestFlight `Additional > Test Information`: beta description, feedback email, review contact/demo notes.
+- [ ] Create an internal group before creating an external group; ASC requires this order.
+- [ ] For external testing, create an external group, add one build, enter `What to Test`, choose whether to notify testers automatically, then click `Submit Review`.
+- [ ] External testers require TestFlight App Review for the first build in a group; only one build per version can be in review at a time.
 - [ ] Watch TestFlight feedback, screenshots, and crash reports after distribution.
 - [ ] Commit the build-number bump after a successful upload:
 
