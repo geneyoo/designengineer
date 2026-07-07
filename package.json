@@ -1,0 +1,12 @@
+{
+  "name": "designengineer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node tools/check-docs-examples.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "js-yaml": "^4.1.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "designengineer/workorder",
+  "title": "designengineer work order",
+  "description": "Schema for .designengineer/workorders/*.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task", "scope", "done"],
+  "properties": {
+    "task": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allow"],
+      "properties": {
+        "allow": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "deny-new-deps": { "type": "boolean" },
+        "max-files": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "exemplar": { "type": "string", "minLength": 1 },
+    "done": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["verify"],
+        "properties": {
+          "verify": { "type": "string", "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$" }
+        }
+      }
+    }
+  }
+}

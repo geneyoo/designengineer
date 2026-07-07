@@ -46,6 +46,20 @@ The repo should favor:
   quality control.
 - `docs/research/rulepacks.md`: taste, design-system, copy, and asset-style
   checks normalized into reusable repo-local contracts.
+- `schema/config.schema.json`: normative contract for
+  `.designengineer/config.yaml`; doc YAML examples must validate against it.
+- `schema/workorder.schema.json`: contract for work-order files.
+- `tools/check-docs-examples.mjs`: the `docs-examples` rulepack. Validates all
+  doc YAML blocks and the repo's own config, checks exemplar existence, and
+  appends ledger evidence. Run with `make check`; wired to pre-commit.
+- `.designengineer/config.yaml`: this repo's own harness config.
+
+## Local Checks
+
+Run `make bootstrap` once after cloning (installs deps and hook path). Every
+YAML example added to docs must validate against the schemas; escape hatch is
+`<!-- docs-ok: reason -->` on the line above the fence, and escapes are
+counted.
 
 ## Done Means
 

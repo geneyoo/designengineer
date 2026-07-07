@@ -50,6 +50,17 @@ codesign -d --entitlements - build/App.xcarchive/Products/Applications/App.app
 - [ ] Fill App Information: subtitle, category, content rights, age rating.
 - [ ] Add privacy policy URL and support URL.
 - [ ] Complete App Privacy answers for first-party and third-party data collection.
+  After selecting collected data types, ASC shows each one as a `Set Up <Data Type>`
+  card. Open every card, answer the per-type questionnaire, save it, and only then
+  click the page-level `Publish` button. The app is not submission-ready while any
+  selected data type still has a warning icon or setup card.
+  Typical first-party account/product analytics setup:
+  - Email Address: linked to user, not used for tracking, App Functionality.
+  - User ID: linked to user, not used for tracking, App Functionality and Analytics.
+  - Device ID: linked to user, not used for tracking, Analytics.
+  - Product Interaction: linked to user, not used for tracking, App Functionality and Analytics.
+  Do not select unused data categories just because APIs exist in the binary; the
+  answers should describe data collected off-device under Apple's App Privacy rules.
 - [ ] Add TestFlight beta app description, feedback email, and beta review information.
 - [ ] Create internal tester group; enable automatic distribution when useful.
 - [ ] For external testers, prepare beta review notes and group/public-link criteria.

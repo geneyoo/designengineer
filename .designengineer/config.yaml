@@ -1,0 +1,24 @@
+version: 1
+
+rulepacks:
+  docs-examples:
+    check: make check
+    latency: pre-commit
+    escape: docs-ok
+    rules:
+      docs.yaml-parse:
+        severity: error
+        fix: Fix the YAML syntax in the example block.
+        exemplar: docs/research/rulepacks.md
+      docs.invalid-example:
+        severity: error
+        fix: Match the contracts in schema/config.schema.json and schema/workorder.schema.json.
+        exemplar: schema/config.schema.json
+      docs.unknown-example-shape:
+        severity: error
+        fix: Use config or work-order keys, or add a docs-ok escape above the block.
+        exemplar: schema/config.schema.json
+      docs.missing-exemplar:
+        severity: error
+        fix: Point rule exemplars at committed files in this repo.
+        exemplar: docs/research/rulepacks.md
