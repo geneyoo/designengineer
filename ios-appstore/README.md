@@ -58,7 +58,8 @@ codesign -d --entitlements - build/App.xcarchive/Products/Applications/App.app
   - Email Address: linked to user, not used for tracking, App Functionality.
   - User ID: linked to user, not used for tracking, App Functionality and Analytics.
   - Device ID: linked to user, not used for tracking, Analytics.
-  - Product Interaction: linked to user, not used for tracking, App Functionality and Analytics.
+  - Product Interaction: linked to user, not used for tracking, Analytics; add
+    App Functionality only if product events directly power app behavior.
   Do not select unused data categories just because APIs exist in the binary; the
   answers should describe data collected off-device under Apple's App Privacy rules.
 - [ ] Add TestFlight beta app description, feedback email, and beta review information.
