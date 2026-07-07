@@ -63,11 +63,15 @@ codesign -d --entitlements - build/App.xcarchive/Products/Applications/App.app
 - [ ] Privacy/support URLs are live.
 - [ ] App-specific reviewer notes cover sensitive permissions, login/demo flow, and reset path.
 - [ ] If using restricted entitlements, every entitled app/extension bundle ID is enabled in the developer portal.
+- [ ] Every embedded extension is App Store-valid. Remove unfinished extensions from the app embed until their icons/assets/Info.plist are complete.
+- [ ] Info.plist purpose strings cover every linked capability/API Apple validates, including read and write variants such as Health share/update keys.
+- [ ] Portrait-only iOS apps either declare valid iPad orientations or set `UIRequiresFullScreen`/target device family intentionally.
 
 ## 5. Upload And TestFlight
 
 - [ ] Run `make release-bump`.
 - [ ] If upload fails with "no app record" or the app is absent from ASC Apps, create the ASC app record first, then rerun.
+- [ ] The ASC app-list icon appears only after a build with a valid 1024px app icon is uploaded and processed; creating the ASC record alone shows a placeholder.
 - [ ] Wait for processing in ASC TestFlight.
 - [ ] If status is `Missing Compliance`, answer/export compliance before testing.
 - [ ] When status is `Ready to Submit` or `Testing`, add the build to internal testers.
