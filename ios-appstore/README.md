@@ -46,6 +46,7 @@ codesign -d --entitlements - build/App.xcarchive/Products/Applications/App.app
 ## 3. App Store Connect Setup
 
 - [ ] Create the ASC app record: platform, name, primary bundle ID, SKU, user access.
+- [ ] Confirm the app appears under ASC Apps. A Developer Portal Bundle ID is necessary, but it is not an ASC app record.
 - [ ] Fill App Information: subtitle, category, content rights, age rating.
 - [ ] Add privacy policy URL and support URL.
 - [ ] Complete App Privacy answers for first-party and third-party data collection.
@@ -66,6 +67,7 @@ codesign -d --entitlements - build/App.xcarchive/Products/Applications/App.app
 ## 5. Upload And TestFlight
 
 - [ ] Run `make release-bump`.
+- [ ] If upload fails with "no app record" or the app is absent from ASC Apps, create the ASC app record first, then rerun.
 - [ ] Wait for processing in ASC TestFlight.
 - [ ] If status is `Missing Compliance`, answer/export compliance before testing.
 - [ ] When status is `Ready to Submit` or `Testing`, add the build to internal testers.
