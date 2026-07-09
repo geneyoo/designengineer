@@ -27,8 +27,11 @@ call slow third-party APIs, process user uploads, or run in deployable workers.
 - [ ] Retryable failures have attempt limits and backoff.
   - Enforcement: tests cover retryable vs terminal classifications.
 - [ ] User-visible polling can always reach a terminal state.
-  - Enforcement: poll response includes `pollAfterSeconds`, `failureCode`, and a
-  generic `failureMessage`.
+  - Enforcement: poll response includes `pollAfterSeconds`, an absolute
+  stop-polling deadline, `failureCode`, and a generic `failureMessage`.
+- [ ] Stale or owner-scoped job IDs cannot spin forever.
+  - Enforcement: clients treat 404 as terminal for the local job id and recover
+  through the durable domain key, such as `clientPetId` or order id.
 
 ## Upload Safety
 
