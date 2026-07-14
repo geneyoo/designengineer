@@ -1,4 +1,4 @@
-.PHONY: bootstrap check
+.PHONY: bootstrap check test-resource-lease
 
 bootstrap:
 	npm install
@@ -6,3 +6,7 @@ bootstrap:
 
 check:
 	@node tools/check-docs-examples.mjs
+	@$(MAKE) -s test-resource-lease
+
+test-resource-lease:
+	@./tools/test-resource-lease.sh

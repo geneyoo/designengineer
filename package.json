@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node tools/check-docs-examples.mjs"
+    "check": "node tools/check-docs-examples.mjs && bash tools/test-resource-lease.sh",
+    "test:resource-lease": "bash tools/test-resource-lease.sh"
   },
   "dependencies": {
     "ajv": "^8.17.1",

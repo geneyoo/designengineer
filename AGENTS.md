@@ -46,12 +46,17 @@ The repo should favor:
   quality control.
 - `docs/research/rulepacks.md`: taste, design-system, copy, and asset-style
   checks normalized into reusable repo-local contracts.
+- `docs/resource-leases.md`: process-owned exclusive-resource contract and
+  repo integration pattern.
 - `schema/config.schema.json`: normative contract for
   `.designengineer/config.yaml`; doc YAML examples must validate against it.
 - `schema/workorder.schema.json`: contract for work-order files.
 - `tools/check-docs-examples.mjs`: the `docs-examples` rulepack. Validates all
   doc YAML blocks and the repo's own config, checks exemplar existence, and
   appends ledger evidence. Run with `make check`; wired to pre-commit.
+- `tools/resource-lease.sh`: macOS reference implementation for session-owned
+  resource leases; `tools/test-resource-lease.sh` verifies acquisition,
+  repo isolation, conflict rejection, and automatic release.
 - `.designengineer/config.yaml`: this repo's own harness config.
 
 ## Local Checks

@@ -87,6 +87,21 @@ command, check command, preview path, and ledger invalidation mode. Factory
 checks should use check IDs such as `factory.web-tokens` and write the same
 ledger entries as `designengineer verify`.
 
+### 7. Process-owned exclusive resource leases
+
+- `~/shaba/scripts/ios/simulator-lease.sh`: uses macOS `lockf` plus a
+  non-restarting launchd holder to bind one exact simulator UDID to the owning
+  Codex, Claude, or terminal process. Guarded Make targets assert ownership;
+  the lease disappears after the owner exits, with no manual unlock step.
+- `~/shaba/Makefile`: makes simulator selection explicit and puts the lease
+  assertion directly in every simulator-mutating target.
+
+This was extracted after parallel agents selected different iPhone 17
+simulators and installed into each other's sessions. The generalized prototype
+is `tools/resource-lease.sh`, with lifecycle coverage in
+`tools/test-resource-lease.sh`. The stable identity can represent a simulator,
+physical device, port, test database, or any other exclusive local resource.
+
 ## What NOT to carry over
 
 - `~/prettyplease/CLAUDE.md` (362 lines of prose rules) is the anti-pattern

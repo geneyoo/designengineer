@@ -47,6 +47,8 @@ This repo will track research and prototypes around:
 - Escape-hatch accounting as a drift metric.
 - Quality-controlled factories for tokens, icons, snapshots, screenshots, and
   other generated artifacts.
+- Process-owned leases for scarce local resources such as simulators, devices,
+  ports, and test databases.
 
 ## Existing Tools To Build Around
 
@@ -86,6 +88,9 @@ designengineer factory list
 designengineer factory run web-tokens
 designengineer factory check web-tokens
 designengineer factory preview ios-design-gallery
+designengineer resource acquire ios-simulator
+designengineer resource assert ios-simulator
+designengineer resource status ios-simulator
 designengineer add-rulepack copy-style --check "make lint"
 designengineer verify rulepack.copy-style
 designengineer explain-rules
@@ -102,6 +107,11 @@ Factories are the narrower proven version of generation: source of truth,
 deterministic output, preview surface, and drift check. Existing token, icon,
 design-gallery, and screenshot generators in local repos should be extracted
 as factories before inventing broad scaffolding.
+
+Resource leases are a separate enforcement primitive for commands that mutate
+scarce local state. The current macOS prototype binds a stable resource
+identity to an agent-session process, rejects competing owners, and releases
+automatically when that process exits. See `docs/resource-leases.md`.
 
 Example config:
 
