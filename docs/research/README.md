@@ -29,6 +29,7 @@ Decision:
 - Rulepack extraction
 - Moveset extensions
 - Factory patterns
+- Cross-harness PR lifecycle and on-demand review (WIP, shelved)
 - Context7
 - Superpowers
 - Anthropic LSP plugins
@@ -56,3 +57,5 @@ See `rulepacks.md` for the lightweight way to normalize repo-specific taste
 checks without replacing existing scripts.
 See `str8flush-adoption-lessons.md` for the first adoption PR lessons around
 scope hygiene, deferred findings, aggregate checks, and exemplar integrity.
+See `cross-harness-pr-reviews.md` for the shelved WIP proposal covering a
+one-command worktree/draft-PR envelope and explicitly on-demand agent review.

@@ -46,14 +46,20 @@ The repo should favor:
   quality control.
 - `docs/research/rulepacks.md`: taste, design-system, copy, and asset-style
   checks normalized into reusable repo-local contracts.
+- `docs/research/cross-harness-pr-reviews.md`: Claude/Codex PR handoff,
+  critique, automation, and integration-agent contract.
 - `docs/resource-leases.md`: process-owned exclusive-resource contract and
   repo integration pattern.
+- `.agent-skills/critique-pr`: canonical provider-neutral PR critique skill;
+  `.agents/skills` and `.claude/skills` expose it to each harness.
 - `schema/config.schema.json`: normative contract for
   `.designengineer/config.yaml`; doc YAML examples must validate against it.
 - `schema/workorder.schema.json`: contract for work-order files.
 - `tools/check-docs-examples.mjs`: the `docs-examples` rulepack. Validates all
   doc YAML blocks and the repo's own config, checks exemplar existence, and
   appends ledger evidence. Run with `make check`; wired to pre-commit.
+- `tools/check-cross-harness-skills.mjs`: validates portable skill frontmatter
+  and ensures Claude/Codex discovery entries resolve to one canonical skill.
 - `tools/resource-lease.sh`: macOS reference implementation for session-owned
   resource leases; `tools/test-resource-lease.sh` verifies acquisition,
   repo isolation, conflict rejection, and automatic release.

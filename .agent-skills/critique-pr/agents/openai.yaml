@@ -1,0 +1,4 @@
+interface:
+  display_name: "Critique PR"
+  short_description: "Review PR intent, implementation, and risks"
+  default_prompt: "Use $critique-pr to independently review the current pull request."

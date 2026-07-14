@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node tools/check-docs-examples.mjs && bash tools/test-resource-lease.sh",
+    "check": "node tools/check-docs-examples.mjs && node tools/check-cross-harness-skills.mjs && node tools/test-pr-context.mjs && bash tools/test-resource-lease.sh",
+    "test:pr-context": "node tools/test-pr-context.mjs",
     "test:resource-lease": "bash tools/test-resource-lease.sh"
   },
   "dependencies": {
