@@ -6,6 +6,7 @@ bootstrap:
 
 check:
 	@node tools/check-docs-examples.mjs
+	@node tools/check-no-sparkles.mjs
 	@$(MAKE) -s test-resource-lease
 
 test-resource-lease:
