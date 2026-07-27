@@ -46,8 +46,10 @@ The repo should favor:
   quality control.
 - `docs/research/rulepacks.md`: taste, design-system, copy, and asset-style
   checks normalized into reusable repo-local contracts.
-- `docs/resource-leases.md`: process-owned exclusive-resource contract and
-  repo integration pattern.
+- `docs/resource-leases.md`: process-owned exclusive-resource contract, in both
+  fixed-identity and pool form, plus the repo integration pattern.
+- `docs/workflow-guards.md`: writer isolation, lanes, admission, ratchet rules,
+  and the order to drop them into an existing project.
 - `schema/config.schema.json`: normative contract for
   `.designengineer/config.yaml`; doc YAML examples must validate against it.
 - `schema/workorder.schema.json`: contract for work-order files.

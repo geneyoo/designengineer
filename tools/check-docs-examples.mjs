@@ -23,7 +23,7 @@ const workorderSchema = JSON.parse(readFileSync(join(repoRoot, 'schema/workorder
 const validateConfig = ajv.compile(configSchema)
 const validateWorkorder = ajv.compile(workorderSchema)
 
-const CONFIG_KEYS = new Set(['version', 'rulepacks', 'checks', 'factories', 'resources', 'tiers'])
+const CONFIG_KEYS = new Set(['version', 'rulepacks', 'checks', 'factories', 'resources', 'tiers', 'workflow'])
 const WORKORDER_KEYS = new Set(['task', 'scope', 'exemplar', 'done'])
 
 const failures = []

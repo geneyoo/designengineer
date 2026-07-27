@@ -80,3 +80,69 @@ or a non-unique display name.
 Run `make test-resource-lease` on macOS to verify unlocked status, idempotent
 acquisition, repo isolation, same-owner assertion, competing-owner rejection,
 and automatic release after the owner process exits.
+
+## Pool Leases
+
+A fixed identity is the right contract for a resource there is exactly one of:
+a physical device, a port, a shared staging database. It is the wrong contract
+for a resource the machine can make more of. Pinning every worktree to one
+simulator UDID serializes agents that did not need to be serialized, and the
+second agent either blocks or, worse, quietly picks a different device by name.
+
+The pool form keeps one-writer-per-resource while letting the repository use
+several. `~/shaba/scripts/ios/simulator-lease.sh` is the working
+implementation and evolved out of the fixed-identity version documented above.
+
+The mechanics that matter:
+
+- **The lock stays per identity.** One `lockf` lock per UDID, exactly as
+  before. The pool is an allocation strategy layered on top, not a weaker lock.
+- **Affinity, not assignment.** Each worktree remembers a preferred UDID in
+  the repository's common git directory, keyed by a hash of the worktree path.
+  A busy preferred device is not an error; allocation simply continues to the
+  next free one. Closing a managed worktree removes its saved preference.
+- **Reuse before boot.** Allocation prefers an already-booted free device over
+  booting another. Booting is the expensive step.
+- **Idle expiry with a heartbeat.** Leases expire after a TTL. Long-running
+  commands hold the lease open with a keepalive rather than by extending the
+  TTL for everyone. Owner death still frees the OS lock immediately; the TTL
+  covers the case where the owner lives but has moved on.
+- **A warm spare and a reap grace.** Keep one free device booted so the next
+  acquisition is fast, and shut down surplus free devices after a grace period
+  so the pool does not grow without bound.
+
+```yaml
+resources:
+  ios-simulator:
+    kind: pool-lease
+    provider: macos-lockf
+    identity: ios-simulator
+    owner: agent-session
+    release: [process-exit, ttl-expiry]
+    pool:
+      select: xcrun simctl list devices available
+      affinity: worktree
+      ttl: 300s
+      keepalive: ./scripts/ios/simulator-lease.sh keepalive
+      warm: 1
+      reap-grace: 90s
+    guards:
+      - make ios-install
+      - make ios-test
+    test: ./scripts/ios/simulator-lease-test.sh
+```
+
+Two integration rules survive from the fixed-identity form and get sharper
+here:
+
+- **Resolve the identity once, then name it.** `SIMULATOR_UDID="$(make
+  ios-sim-udid)"` and pass that UDID to every `simctl` call. A pool makes
+  "booted" and "latest" more dangerous, not less, because there is now more
+  than one candidate.
+- **One install path.** If a second target can install or launch without
+  asserting the lease, the pool guarantees nothing. Route every mutating
+  command through the guarded verb.
+
+The lease test must cover pool behavior without touching real Simulators:
+allocation, affinity reuse, contention falling through to a free device,
+expiry, and cleanup of surplus devices.
