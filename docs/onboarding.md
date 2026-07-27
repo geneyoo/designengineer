@@ -51,6 +51,18 @@ Detection should look for:
 - generated outputs without drift checks
 - scripts whose names include `check`, `verify`, `lint`, `design`, `tokens`,
   `icon`, `asset`, `snapshot`, `screenshot`, `gallery`, or `audit`
+- workflow guards: existing `git worktree` usage, branch or worktree lease
+  registries, editor-tool hooks in `.claude/settings.json` or `.codex/`,
+  check-mode environment variables, PR and merge wrapper scripts, branch
+  rulesets, and lock files for simulators, devices, ports, or test databases
+
+Workflow guards deserve their own pass because they are usually the widest gap
+and the cheapest to close. The scan should report, specifically: whether the
+default branch can be committed to directly, whether more than one agent can
+write to the same checkout, whether any check is unskippable, and whether any
+scarce local resource is selected by name rather than by identity. See
+[`workflow-guards.md`](workflow-guards.md) for the contract and the adoption
+order.
 
 The scan should classify each finding:
 
@@ -76,9 +88,16 @@ The product should then suggest the smallest safe moves:
 6. Move fast checks to pre-commit.
 7. Move slow checks to pre-push or CI.
 8. Promote WARN to ERROR only after the repo is clean.
+9. Install the workflow guards in the order given in `workflow-guards.md`,
+   starting with the hook path and a default-branch refusal.
 
 For an existing project, the first win is not adding rules. The first win is
 making current rules visible, runnable, and measurable.
+
+The one exception is writer isolation. Refusing commits on the default branch
+and giving each agent its own leased worktree adds no rules to the code and
+prevents a class of loss that no amount of later measurement can undo, so it
+can go in before the inventory is complete.
 
 ## PR Scope Hygiene
 
@@ -123,6 +142,7 @@ themes/fonts.instructions.md
 themes/ui-common-elements.instructions.md
 scripts/design-system-check.sh
 scripts/copy-style-check.sh
+scripts/worktree.sh
 ```
 
 The new-project path should ask for stack and product shape, then create only:
@@ -132,6 +152,13 @@ The new-project path should ask for stack and product shape, then create only:
 - one design-system rulepack
 - one verification command
 - one example factory candidate if the stack has generated assets or tokens
+- writer isolation: the hook path, a default-branch refusal, and the worktree
+  lease verbs
+
+Writer isolation is the one guard a blank repo should get on day one, because
+retrofitting it means retrofitting every agent's habits. The rest of
+`workflow-guards.md` (lanes, admission, merge queue, resource leases) waits
+until the project has a remote, real pull requests, or more than one agent.
 
 It should avoid broad component generators until telemetry shows repeated
 failure that exemplars and checks do not solve.
@@ -152,9 +179,15 @@ ladder:
 8. **Promote**: move WARN rules to ERROR only after data shows they are clean.
 9. **Factory**: when the same violation repeats, build a source-to-output
    factory instead of adding more prose.
+10. **Isolate and admit**: install the workflow guards, ending with an
+    unskippable remote gate. See `workflow-guards.md`.
 
 This lets mature repos keep momentum. The harness starts as an observability
 and wrapping layer, then earns the right to block.
+
+Steps 1 through 9 run on the rule ladder; step 10 runs on the workflow ladder
+and is independent of it. A repo with no rules at all still benefits from
+writer isolation, and a repo with excellent rules still loses work without it.
 
 ## First Screen
 
@@ -168,12 +201,15 @@ Found:
   1 token generator without preview
   14 prose-only rules in AGENTS.md
   3 escape-hatch markers
+  0 workflow guards: main accepts direct commits, no worktree leases,
+    simulator selected by name, no unskippable remote check
 
 Recommended:
   wrap make ios-design-check as rulepack.ios-design
   wrap scripts/ios/no-em-dash-check.sh as rulepack.copy-style
   add ledger evidence for make ios-verify
   leave all new rules as WARN
+  install workflow.writer-isolation: hook path + main refusal (2 files)
 
 Deferred:
   detected app icon asset workflow, not included in this PR

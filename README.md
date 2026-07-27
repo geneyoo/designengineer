@@ -49,6 +49,12 @@ This repo will track research and prototypes around:
   other generated artifacts.
 - Process-owned leases for scarce local resources such as simulators, devices,
   ports, and test databases.
+- Workflow guards that make parallel agents safe: one writer per branch and
+  worktree, named check lanes, and an unskippable admission gate.
+
+Rules govern what an agent writes. Workflow guards govern where it writes, what
+it may touch while writing, when checks run, and what must be true before work
+merges. Both halves ship together; see `docs/workflow-guards.md`.
 
 ## Existing Tools To Build Around
 

@@ -89,10 +89,10 @@ ledger entries as `designengineer verify`.
 
 ### 7. Process-owned exclusive resource leases
 
-- `~/shaba/scripts/ios/simulator-lease.sh`: uses macOS `lockf` plus a
-  non-restarting launchd holder to bind one exact simulator UDID to the owning
-  Codex, Claude, or terminal process. Guarded Make targets assert ownership;
-  the lease disappears after the owner exits, with no manual unlock step.
+- `~/shaba/scripts/ios/simulator-lease.sh`: macOS `lockf` plus a
+  non-restarting launchd holder, binding a simulator UDID to the owning Codex,
+  Claude, or terminal process. Guarded Make targets assert ownership; the lease
+  disappears after the owner exits, with no manual unlock step.
 - `~/shaba/Makefile`: makes simulator selection explicit and puts the lease
   assertion directly in every simulator-mutating target.
 
@@ -101,6 +101,51 @@ simulators and installed into each other's sessions. The generalized prototype
 is `tools/resource-lease.sh`, with lifecycle coverage in
 `tools/test-resource-lease.sh`. The stable identity can represent a simulator,
 physical device, port, test database, or any other exclusive local resource.
+
+`shaba` has since moved past the prototype's fixed single identity to a pool:
+per-worktree affinity, reuse of an already-booted free device before booting
+another, TTL expiry with a keepalive heartbeat, one warm spare, and reaping of
+surplus free devices. The lock is still one per UDID; only allocation changed.
+`tools/resource-lease.sh` does not implement the pool form yet, so pool
+behavior is a documented contract with working prior art, not a shipped
+prototype. See `docs/resource-leases.md`.
+
+### 8. Workflow guards: writer isolation, lanes, and admission
+
+The largest unextracted block, and the one with no equivalent anywhere else in
+the local prior art:
+
+- `~/shaba/scripts/worktree.sh`: the lease registry. Records path, branch,
+  owner, and creation time under the common git directory; refuses commits on
+  the default branch; refuses work in a worktree owned by another agent; caps
+  active managed worktrees; closes only clean merged worktrees and preserves
+  branches that still own an open child PR.
+- `~/shaba/scripts/claude-worktree-guard.sh`: a `PreToolUse` hook that denies
+  `Edit`/`Write`/`NotebookEdit` into an unleased or foreign worktree. Fails
+  open for targets it cannot place in the repository, fails closed once it can.
+  Documents its own bypass surface (shell writes) rather than overclaiming.
+- `~/shaba/.githooks/pre-commit`, `pre-push`, and `HATCH_CHECK_MODE`: named
+  check lanes. The default lane runs the workflow guards and nothing else; the
+  slow lane is opt-in per push.
+- `~/shaba/.github/workflows/lightning.yml`: admission as a named remote check,
+  running lint with the PR base SHA as ratchet base, plus guard tests, docs,
+  and naming gates.
+- `~/shaba/scripts/merge-queue.sh`: stack-aware serialization, child retarget
+  before branch deletion, interrupted-retarget repair, and retry when another
+  agent merges first.
+- `~/shaba/scripts/open-pr.sh` and `scripts/github-enforce.sh`: wrapping the PR
+  verb so a provider defect is routed around in one place, and keeping branch
+  protection as a checked-in verb instead of console state.
+- `~/shaba/scripts/ios/swift-source-size-check.sh`: the ratchet severity.
+  Touched files already over the soft limit may not grow; the hard limit blocks
+  outright; the base ref arrives by environment so local and CI differ.
+- `~/shaba/scripts/*-test.sh` behind `make workflow-test`: every guard has a
+  test that asserts the denial, and admission runs them.
+
+Generalization target: `docs/workflow-guards.md` states the contract and the
+`workflow:` config block. The harness verbs (`designengineer wt`,
+`designengineer lane`, `designengineer admit`) are not designed yet, and should
+not be until the contract has been adopted into a second repo by hand.
 
 ## What NOT to carry over
 
