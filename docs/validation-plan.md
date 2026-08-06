@@ -77,6 +77,12 @@ These are product constraints, not aspirations.
   `check changed` should stay under 30 seconds.
 - Slow checks move later. Full builds, snapshots, device runs, staging smoke,
   and dependency audits belong in pre-push, CI, or explicit `verify`.
+- CI lanes are capability-scoped. Default to the cheapest runner that can run
+  the exact command, prove parity before moving a gate across platforms, and
+  condition expensive lanes on a complete input set.
+- Conditional lanes fail closed. Selector errors are failures, required
+  aggregate statuses inspect every direct dependency result, and
+  environment-coupled checks also run on a schedule.
 - WARN before ERROR for new rules. Promote only after the repo is clean or the
   escape hatch policy is clear.
 - Every ERROR teaches. Failures must include a rule ID, fix guidance, and an
@@ -97,6 +103,9 @@ V0 should prove value inside `palette` before becoming generic.
    - run existing `make *-verify` targets
    - append ledger entries
    - expose `status` and `assert`
+   - record each lane's CI command, required capabilities, and complete input
+     set
+   - verify selector fixtures and required-status failure propagation
 
 2. Normalize design checks:
    - extract rule IDs from existing SwiftUI checks

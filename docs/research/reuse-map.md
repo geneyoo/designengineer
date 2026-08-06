@@ -57,11 +57,23 @@ verification ledger (see `verification-ledger.md`).
 "Every legal move is enumerated and demo'd" — exactly the small-legal-move-set
 claim, already enforced mechanically.
 
-### 5. CI template
+### 5. CI lane integrity and cost
 
 - `~/palette/.github/workflows/server-ci.yml`: minimal Actions wiring for
   `make *-verify` gates. prettyplease has no CI; hooks-only enforcement dies
   on `--no-verify`.
+- [shaba PR 421](https://github.com/geneyoo/shaba/pull/421): split one mixed
+  lint lane by required capability, proved SwiftLint parity across runners,
+  removed duplicate executions, dispatched the macOS-only test from a closed
+  input set, and kept one fail-closed required status. Review caught missing
+  `.PHONY` targets, an ambiguous `git | grep -q` detector, a CI-only version
+  pin, and an unverified tool download.
+
+Generalization target: checks declare the CI command, capability requirement,
+input closure, toolchain identity, and freshness class. `check workflow`
+verifies selectors and required-gate propagation. Runner-cost claims record
+the dated rate source, actual and billed minutes, duplicate execution count,
+and historical trigger rate. See `shaba-pr-421-ci-lessons.md`.
 
 ### 6. Quality-controlled factories
 

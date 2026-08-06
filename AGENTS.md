@@ -44,6 +44,8 @@ The repo should favor:
 - `docs/research/verification-ledger.md`: evidence model for local verification.
 - `docs/research/factory-patterns.md`: generated-output patterns with baked-in
   quality control.
+- `docs/research/shaba-pr-421-ci-lessons.md`: capability-scoped CI lanes,
+  closed input sets, fail-closed aggregation, and dated cost evidence.
 - `docs/research/rulepacks.md`: taste, design-system, copy, and asset-style
   checks normalized into reusable repo-local contracts.
 - `docs/resource-leases.md`: process-owned exclusive-resource contract and
@@ -57,14 +59,20 @@ The repo should favor:
 - `tools/resource-lease.sh`: macOS reference implementation for session-owned
   resource leases; `tools/test-resource-lease.sh` verifies acquisition,
   repo isolation, conflict rejection, and automatic release.
+- `tools/paths-changed.sh`: fail-closed, path-scoped Git change detector;
+  `tools/test-paths-changed.sh` covers positive, negative, error, and usage
+  cases.
+- `.github/workflows/admission.yml`: Linux portable checks plus a
+  change-scoped and weekly macOS resource-lease lane behind one stable status.
 - `.designengineer/config.yaml`: this repo's own harness config.
 
 ## Local Checks
 
-Run `make bootstrap` once after cloning (installs deps and hook path). Every
-YAML example added to docs must validate against the schemas; escape hatch is
-`<!-- docs-ok: reason -->` on the line above the fence, and escapes are
-counted.
+Run `make bootstrap` once after cloning (installs deps and hook path).
+`make check` is the complete local gate; `make check-portable` is the
+platform-neutral subset used by CI. Every YAML example added to docs must
+validate against the schemas; escape hatch is `<!-- docs-ok: reason -->` on
+the line above the fence, and escapes are counted.
 
 ## Done Means
 
