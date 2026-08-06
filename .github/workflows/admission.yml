@@ -1,0 +1,86 @@
+name: admission
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # The resource lease is environment-coupled, so exercise it weekly even
+    # when its source has not changed.
+    - cron: "23 12 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admission-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable:
+    name: portable checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      resource_lease_changed: ${{ steps.resource_lease.outputs.changed }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+      - run: make check-portable
+
+      # Run the macOS integration test only when its complete input set changes.
+      # The macOS job invokes the test script directly, so Makefile churn is not
+      # part of that set. Scheduled and manual runs exercise the environment.
+      - name: Detect resource-lease changes
+        id: resource_lease
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          changed=true
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            changed="$(./tools/paths-changed.sh "$BASE_SHA" HEAD -- \
+              .github/workflows/admission.yml \
+              tools/paths-changed.sh \
+              tools/resource-lease.sh \
+              tools/test-resource-lease.sh)"
+          fi
+          printf 'changed=%s\n' "$changed" >> "$GITHUB_OUTPUT"
+          printf 'Resource lease changed: %s\n' "$changed"
+
+  # Keep one stable required check. It runs on macOS only when the portable job
+  # proves the resource-lease input set changed (or on a scheduled/manual run),
+  # and otherwise uses Linux for the inexpensive aggregation step.
+  admission:
+    name: admission
+    needs: portable
+    if: ${{ always() }}
+    runs-on: ${{ needs.portable.outputs.resource_lease_changed == 'true' && 'macos-15' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - name: Require portable checks
+        env:
+          PORTABLE_RESULT: ${{ needs.portable.result }}
+        run: |
+          if [ "$PORTABLE_RESULT" != "success" ]; then
+            printf 'Portable checks finished with: %s\n' "$PORTABLE_RESULT" >&2
+            exit 1
+          fi
+
+      - if: ${{ needs.portable.outputs.resource_lease_changed == 'true' }}
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Test macOS resource lease
+        if: ${{ needs.portable.outputs.resource_lease_changed == 'true' }}
+        run: ./tools/test-resource-lease.sh
+
+      - name: Report skipped macOS lane
+        if: ${{ needs.portable.outputs.resource_lease_changed != 'true' }}
+        run: printf 'Resource-lease inputs unchanged; macOS lane not provisioned.\n'

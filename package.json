@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node tools/check-docs-examples.mjs && bash tools/test-resource-lease.sh",
+    "check": "make check",
+    "check:portable": "make check-portable",
+    "test:paths-changed": "bash tools/test-paths-changed.sh",
     "test:resource-lease": "bash tools/test-resource-lease.sh"
   },
   "dependencies": {

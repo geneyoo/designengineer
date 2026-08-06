@@ -10,6 +10,10 @@ OWNER_PID=""
 
 if [[ "$(uname -s)" != "Darwin" ]] \
     || ! launchctl print "gui/$(id -u)" >/dev/null 2>&1; then
+    if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+        printf 'resource-lease test: macOS GUI launchd session is unavailable in CI\n' >&2
+        exit 1
+    fi
     printf 'resource-lease test: skipped (macOS GUI launchd session required)\n'
     exit 0
 fi

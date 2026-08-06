@@ -22,3 +22,12 @@ rulepacks:
         severity: error
         fix: Point rule exemplars at committed files in this repo.
         exemplar: docs/research/rulepacks.md
+  no-sparkles:
+    check: node tools/check-no-sparkles.mjs
+    latency: pre-commit
+    escape: sparkles-ok
+    rules:
+      asset.sparkles-icon:
+        severity: error
+        fix: Replace the sparkles / magic-wand AI-cliche icon with a purpose-specific glyph, or add a sparkles-ok escape.
+        exemplar: docs/no-sparkles.md

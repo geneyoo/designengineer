@@ -56,3 +56,5 @@ See `rulepacks.md` for the lightweight way to normalize repo-specific taste
 checks without replacing existing scripts.
 See `str8flush-adoption-lessons.md` for the first adoption PR lessons around
 scope hygiene, deferred findings, aggregate checks, and exemplar integrity.
+See `shaba-pr-421-ci-lessons.md` for capability-scoped CI lanes, closed input
+sets, fail-closed required statuses, and dated cost evidence.
