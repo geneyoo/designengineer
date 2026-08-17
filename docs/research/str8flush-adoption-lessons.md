@@ -1,5 +1,9 @@
 # str8flush Adoption Lessons
 
+> Historical adoption case. The scope findings remain current; commands in the
+> proposed product changes section are roadmap unless the public README lists
+> them as shipped.
+
 The str8flush PR was the first useful pressure test of `init --adopt`.
 
 Result: the direction is right, but the product needs sharper scope hygiene.

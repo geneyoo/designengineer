@@ -1,143 +1,167 @@
-# Reuse Map: palette, shaba, and prettyplease
+# Reuse Map: Palette, Hatch, and PrettyPlease
 
-These repos already contain embryonic versions of the harness. The risk for
-this repo is not ideation; it is staying a thesis repo while the working
-machinery sits unextracted next door. Extract, don't invent.
+This is provenance for the portable contracts in this repository, not an
+installation guide. It was re-verified against the local source repositories
+on 2026-08-17. Public adopters need only the distilled contracts and runnable
+examples checked in here.
 
-## Highest-value extractions (in order)
+## 1. Design-system and taste checks
 
-### 1. Design-system and taste checks (the proven core)
+The three source repositories prove the same structure across different
+stacks:
 
-- `~/palette/scripts/ios/design-system-check.sh` (167 lines, rg+awk):
-  bans raw SwiftUI fonts/colors/radii/materials/Button/List, forces
-  `Palette*` tokens/components, and enforces gallery-catalog registration.
-  Escape hatch: `palette-design-system: allow-system-button`.
-- `~/palette/scripts/www/design-audit*.{sh,mjs}`: stylelint token-prefix
-  enforcement + JSX inline-style guard. Same rule, web flavor.
-- `~/prettyplease/scripts/ios/design-system-check.sh`: two-tier ERROR/WARN
-  model with `// design-ok: <reason>` escape hatch and a cross-target
-  palette-parity check (shield extension hexes must exist in Colors.swift).
-- `~/shaba/scripts/ios/design-system-check.sh`: compact PrettyPlease-derived
-  design-system check for colors, system hues, fonts, and radii.
-- `~/shaba/scripts/ios/no-em-dash-check.sh`: a tiny copy-style guard wired
-  into `.githooks/pre-commit` and `make lint`.
+- Palette's iOS and web checks reject raw colors, fonts, radii, materials,
+  components, and missing design-gallery registrations.
+- PrettyPlease's iOS check uses ERROR/WARN tiers, a named `design-ok:` escape,
+  and parity checks for extensions that cannot link the main style-guide code.
+- Hatch's checks enforce design tokens, copy style, product naming, prohibited
+  iconography, and ratcheted Swift source size.
 
-Generalization target: `designengineer check design` driven by config, with
-the ERROR/WARN split and named escape hatches from prettyplease. Better
-generalization target: `designengineer verify rulepack.<id>`, where design,
-copy, architecture, and asset-style rules use the same contract.
+Portable capability: rule IDs, scope, severity, fix, exemplar, and counted
+escape hatches.
 
-### 2. Token factory candidate with drift check
+Behavioral bias: prefer the repository's existing tokens/components over new
+visual vocabulary.
 
-- `~/palette/scripts/www/build-tokens.mjs` (433 lines, zero-dep): parses
-  `themes/*.md` markdown tables → generates `tokens.css`/`tokens.ts`;
-  `make www-tokens-check` diffs generated vs committed.
+Risk: regex checks can overclaim semantic coverage. Use SwiftSyntax, ESLint, or
+another AST facility when syntax distinctions matter.
 
-This is the "compile judgment into artifacts" pattern working end to end:
-markdown source of truth → generated code → drift gate.
+Practical implication: extract a working check as a repo-local rulepack before
+turning its preferences into a global agent prompt.
 
-Better label: token factory candidate. It has a source of truth, generated
-outputs, and a freshness check. It needs a declared preview path before the
-repo should call it a full factory.
+## 2. Quality-controlled factories
 
-### 3. Lane dispatch (change-scoped verification)
+Working source patterns include:
 
-- `~/palette/tools/lanes/detect.sh` + `dispatch.sh`: map changed files to a
-  lane (ios/server/www), dispatch verify/lint/build/test to just that lane.
-- `.githooks/pre-commit` + `pre-push` in both repos consume it.
+- Markdown style sources compiled to web token code with a drift check.
+- One brand definition rendered into iOS and web assets.
+- App icon generation plus rasterized geometry tests.
+- Simulator-backed design-system galleries with HTML previews.
+- Config-driven App Store screenshots with raw-source and approved-output
+  directories.
 
-This is the substrate for `designengineer check changed` and for the
-verification ledger (see `verification-ledger.md`).
+Portable capability:
 
-### 4. Gallery-catalog enforcement
+```text
+declared source -> deterministic run -> declared outputs -> drift check -> preview
+```
 
-- `~/palette/apps/ios/Palette/UI/DesignSystem/Gallery/PaletteDesignSystemCatalog.swift`
-  plus the check that every component registers there.
+Behavioral bias: use the existing asset formula rather than asking an agent to
+approximate brand style from prose.
 
-"Every legal move is enumerated and demo'd" — exactly the small-legal-move-set
-claim, already enforced mechanically.
+Risk: a generator without a preview or freshness check creates confident drift.
 
-### 5. CI lane integrity and cost
+Practical implication: factories have stronger local evidence than generic
+component scaffolds. Extract them first.
 
-- `~/palette/.github/workflows/server-ci.yml`: minimal Actions wiring for
-  `make *-verify` gates. prettyplease has no CI; hooks-only enforcement dies
-  on `--no-verify`.
-- [shaba PR 421](https://github.com/geneyoo/shaba/pull/421): split one mixed
-  lint lane by required capability, proved SwiftLint parity across runners,
-  removed duplicate executions, dispatched the macOS-only test from a closed
-  input set, and kept one fail-closed required status. Review caught missing
-  `.PHONY` targets, an ambiguous `git | grep -q` detector, a CI-only version
-  pin, and an unverified tool download.
+## 3. Local lanes and remote admission
 
-Generalization target: checks declare the CI command, capability requirement,
-input closure, toolchain identity, and freshness class. `check workflow`
-verifies selectors and required-gate propagation. Runner-cost claims record
-the dated rate source, actual and billed minutes, duplicate execution count,
-and historical trigger rate. See `shaba-pr-421-ci-lessons.md`.
+The sources now demonstrate two valid profiles rather than one universal lane:
 
-### 6. Quality-controlled factories
+- PrettyPlease is hooks-first: pre-commit runs its design check and affected
+  Swift lint; pre-push runs affected iOS verification. GitHub separately runs
+  path-scoped server CI and a full-history secret scan.
+- Hatch is guarded multi-agent: local commit/push runs writer isolation but no
+  product checks by default. Pull-request admission runs portable lint and
+  guard tests on Linux, provisions a macOS capability job only for its closed
+  input set, and runs PostgreSQL-backed server tests on server changes.
+  Exhaustive cross-surface verification is explicit/manual.
 
-- `~/palette/scripts/ios/design-system-gallery.sh`: simulator-backed design
-  system gallery render that writes
-  `build/ios-design-system-gallery/index.html` and component images.
-- `~/palette/scripts/ios/generate-app-icons.sh`: validates a square source
-  image, generates AppIcon sizes, hero assets, and asset-catalog metadata.
-- `~/prettyplease/scripts/ios/render-brand-assets.sh`: renders iOS/web brand
-  assets from a single brand definition.
-- `~/prettyplease/PrettyPleaseTests/PrettyIconVisualGeometryTests.swift`:
-  rasterizes the app icon and checks geometry so icon regressions are
-  mechanical failures.
-- `~/prettyplease/scripts/marketing/appshot`: config-driven App Store
-  screenshot renderer.
-- `~/palette/themes/*.instructions.md`: Palette's style formula for future
-  colors, fonts, common UI elements, and asset treatment. This is source
-  material for token and asset factories, not prose to keep in agent memory.
+Portable capability: named lanes, explicit selectors, closed input sets,
+toolchain identity, fail-closed aggregation, and one stable required status.
 
-Generalization target: `designengineer factory *`, not a generic scaffold
-generator. The harness should declare each factory's source, outputs, run
-command, check command, preview path, and ledger invalidation mode. Factory
-checks should use check IDs such as `factory.web-tokens` and write the same
-ledger entries as `designengineer verify`.
+Behavioral bias: keep the default loop cheap enough that agents do not route
+around it.
 
-### 7. Process-owned exclusive resource leases
+Risk: a zero-validation local lane is safe only with required remote admission.
+Hooks-only enforcement is bypassable; CI-only feedback may be too late.
 
-- `~/shaba/scripts/ios/simulator-lease.sh`: uses macOS `lockf` plus a
-  non-restarting launchd holder to bind one exact simulator UDID to the owning
-  Codex, Claude, or terminal process. Guarded Make targets assert ownership;
-  the lease disappears after the owner exits, with no manual unlock step.
-- `~/shaba/Makefile`: makes simulator selection explicit and puts the lease
-  assertion directly in every simulator-mutating target.
+Practical implication: choose the profile from repository latency and
+concurrency, then state exactly which checks are skipped at each surface.
 
-This was extracted after parallel agents selected different iPhone 17
-simulators and installed into each other's sessions. The generalized prototype
-is `tools/resource-lease.sh`, with lifecycle coverage in
-`tools/test-resource-lease.sh`. The stable identity can represent a simulator,
-physical device, port, test database, or any other exclusive local resource.
+## 4. Writer isolation and integration
 
-## What NOT to carry over
+Hatch's mature workflow adds:
 
-- `~/prettyplease/CLAUDE.md` (362 lines of prose rules) is the anti-pattern
-  by this repo's own thesis. Much of it (the sleep ban, style rules) should
-  compile down to hooks and lint rules, not travel as instructions.
-- The themes/*.md table format is fine for palette but should not be the
-  harness's required token source; accept any source, require the drift check.
+- one branch and leased worktree per writer;
+- a structured editor guard plus Git hook backstops;
+- a cap and stale-lease reap that preserve dirty/unmerged work;
+- checked-in PR-open and branch-enforcement verbs;
+- a stack-aware integration queue with child retarget and interrupted-state
+  repair;
+- denial-path tests for every guard.
 
-## Gaps neither repo covers (honest scoreboard for the thesis)
+Portable capability: observable ownership state and tested transition guards.
 
-- No scaffold generators (`make component` does not exist anywhere). The
-  "CLI verbs → generated structure" leg of the thesis has zero prior art in
-  our own repos. The proven local pattern is narrower: quality-controlled
-  factories for tokens, icons, galleries, and screenshots.
-- No import/architecture boundary checks (buy: dependency-cruiser or
-  eslint-plugin-boundaries for TS; SwiftLint custom rules → SwiftSyntax for
-  real Swift AST).
-- No escape-hatch accounting: `design-ok:` markers accumulate silently.
-  `designengineer check drift` should count and report them.
-- No measurement. See eval note below.
+Behavioral bias: concurrent agents collaborate through branches, PRs, and
+evidence rather than a shared checkout.
 
-## Eval requirement (the ponytail lesson)
+Risk: structured editor hooks do not intercept shell writes; Git hooks can be
+bypassed. Only remote admission is the hard boundary.
 
-Every claim this repo makes needs an agentic benchmark before it ships as a
-recommendation: same tasks, weak model (Haiku-class), with/without rails;
-measure check-pass rate, diff size, escape-hatch count, retries. The corrected
-ponytail benchmarks are the template for honest reporting.
+Practical implication: adopt the contract in [`../workflow-guards.md`](../workflow-guards.md)
+only when concurrent writers are a real operating mode.
+
+## 5. Exclusive resource pools
+
+The first simulator implementation leased one immutable UDID to the owning
+agent process. The current source evolved into a pool with per-worktree
+affinity, free-booted-device reuse, TTL/heartbeat ownership, one warm spare,
+and surplus-device reaping. The lock remains one per UDID; only allocation
+changed.
+
+This repository ships and tests the fixed-identity primitive. The pool form is
+specified in [`../resource-leases.md`](../resource-leases.md) but is not
+packaged as a generic implementation yet.
+
+Practical implication: fixed leases fit a physical device, port, or database;
+pool leases fit simulators and other resources the machine can provision more
+than once.
+
+## 6. Release and deployment commands
+
+The mature release pattern owns build-number preparation, generated project
+updates, a release branch/worktree, PR admission and merge, final main
+fast-forward, archive, and upload behind one verb. Production uses a distinct
+confirmation-gated command. A failed upload after a merged bump retries the
+same build instead of consuming another number.
+
+Server deployment similarly uses checked-in exact-SHA staging, verification,
+promotion, rollback, capacity, and sanitized status commands. The portable
+contract is in [`../render-bootstrap-agent-runbook.md`](../render-bootstrap-agent-runbook.md).
+
+Practical implication: release operations are repo behavior, not a checklist
+an agent reconstructs from memory.
+
+## 7. Documentation ownership
+
+Hatch's current documentation distinguishes durable product direction, open
+roadmap, active behavior contracts, and archives. Completed implementation
+history stays in Git; the roadmap cannot become a changelog. This prevents an
+agent from treating an old milestone or research note as current scope.
+
+Practical implication: every handoff repository needs a navigation document
+that labels current contracts, maintained references, proposals, and archives.
+This repository's entry point is [`../development-flow.md`](../development-flow.md).
+
+## What not to carry over
+
+- Machine-global design prompts as required dependencies.
+- App-specific architecture or product invariants in a portable kit.
+- Absolute home-directory paths or references to temporary worktrees.
+- Long prose rules when an existing check, type, factory, or hook can enforce
+  the behavior.
+- Provider workarounds taught independently to every agent instead of hidden
+  behind one checked-in command.
+- A merge queue in a solo repository with no CI or stacked branches.
+
+## Remaining gaps
+
+- The scanner proposes stable-looking commands but does not infer semantic
+  dependency graphs or automatically install policy.
+- The generic resource implementation does not allocate pools.
+- Architecture boundary checks still depend on target-stack tooling.
+- Factory preview and invalidation contracts need adoption in a second public
+  repository before they should become generated scaffolds.
+- Product claims still need comparative agent-task measurements: pass rate,
+  retries, diff size, elapsed time, and escape count with and without rails.

@@ -1,7 +1,7 @@
 # Shaba PR 421: Capability-Scoped CI
 
-Source: [geneyoo/shaba#421](https://github.com/geneyoo/shaba/pull/421),
-reviewed 2026-08-06. Pricing cross-check:
+Source: private source-repository PR 421, reviewed 2026-08-06. The portable
+evidence and corrections are preserved in this note. Pricing cross-check:
 [GitHub Actions runner pricing](https://docs.github.com/en/enterprise-cloud@latest/billing/reference/actions-runner-pricing).
 
 ## What The PR Proved

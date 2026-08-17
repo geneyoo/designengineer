@@ -1,263 +1,120 @@
 # Render Server Bootstrap Agent Runbook
 
-Use this as copy/paste context for another app agent when adding a
-Render-hosted server, worker, Postgres, and local env bootstrap.
+Use this contract when adding a Render-hosted API, optional worker, PostgreSQL,
+and CLI-first deployment flow to another repository. It is self-contained; it
+does not depend on another local checkout or on credentials from another app.
 
-## Prompt To Paste
+## Desired result
+
+The target repository owns:
 
 ```text
-We need to add a no-dashboard Render server bootstrap for this app, using the
-same local patterns as these nearby projects:
-
-- ~/palette/render.yaml
-- ~/palette/scripts/server/render-common.sh
-- ~/palette/docs/server-deployment.md
-- ~/palette/docs/dns-runbook.md
-- ~/prettyplease/server/README.md
-- ~/prettyplease/server/.env.example
-- ~/shaba/.claude/worktrees/server-image-gen/render.yaml
-- ~/shaba/.claude/worktrees/server-image-gen/scripts/server/render-bootstrap.sh
-- ~/shaba/.claude/worktrees/server-image-gen/server/.env.example
-- ~/shaba/.claude/worktrees/server-image-gen/docs/genart-server-plan.md
-
-Goal:
-- Create a checked-in Render Blueprint for service shape.
-- Create a scriptable Render bootstrap path that can create/update services,
-  Postgres, env vars, deploys, and smoke checks without dashboard setup.
-- Keep real secrets in the actual gitignored server/.env file, not only in
-  .env.example.
-- Keep required env minimal. Do not ask me to fill every optional default.
-
-Minimal required secrets for a Shaba-like Node server are:
-- RENDER_API_KEY
-- AUTH_CODE_PEPPER
-- RESEND_API_KEY
-- OPENAI_API_KEY if this app uses OpenAI image generation
-
-Optional defaults should stay in code or comments unless the app really needs
-to override them:
-- RENDER_WORKSPACE_ID, otherwise use the active Render workspace
-- GITHUB_REPO_URL
-- RENDER_BRANCH
-- SHABA_RENDER_REGION or app-specific region var
-- SHABA_RENDER_SERVICE_PLAN or app-specific service plan var
-- SHABA_RENDER_POSTGRES_PLAN or app-specific database plan var
-- EMAIL_FROM
-- APPLE_CLIENT_ID
-- provider budget caps
-
-Secret handling rule:
-- Do not print .env files, Render CLI config, Wrangler config, or API keys into
-  chat.
-- If you need to inspect env files, print key names and status only: blank,
-  placeholder, or set.
-- If you need to reuse a value from another local file, pipe/copy it directly
-  into the target server/.env without displaying it.
-- Never use cat on secret-bearing files unless the output is redacted.
-
-Implementation shape:
-- Prefer a dedicated worktree for these edits.
-- Add render.yaml with web service, optional worker, and Postgres.
-- Add scripts/server/check-render.sh, scripts/server/render-common.sh, and
-  scripts/server/render-bootstrap.sh.
-- The bootstrap script should load server/.env first, then validate required
-  secrets.
-- The bootstrap script may use Render CLI for validation/deploys and Render API
-  for creating/updating Postgres, services, and env vars.
-- Remember that Render PUT /env-vars replaces the service env list, so the
-  script must own the full env set it writes.
-- Split least-privilege envs: web gets auth/email secrets; worker gets provider
-  keys.
-- Use Render Postgres internal connection string for DATABASE_URL.
-- Add migrations/predeploy or a worker schema-version startup gate so workers
-  cannot race ahead of migrations.
-- Add Make targets for validate and bootstrap.
-- Update README with the actual minimal required env list.
-- Validate with render blueprints validate, shell syntax checks, git diff
-  --check, and the app server verify command.
+render.yaml                         service/database topology
+server/.env.example                names and documentation, never values
+scripts/server/check-render.sh     static blueprint validation
+scripts/server/render-common.sh    shared API/CLI helpers
+scripts/server/render-bootstrap.sh create/update staging infrastructure
+scripts/server/render-status.sh    sanitized deployed-state report
+server/README.md                    exact setup, deploy, verify, and rollback verbs
 ```
 
-## What To Reuse From Local Projects
+Expose these behind stable commands such as:
 
-`~/palette` is the main reference for deployment posture:
-
-- `render.yaml`: checked-in service shape, `sync: false` for secrets, staging
-  auto deploy, production manual deploy.
-- `docs/server-deployment.md`: principles: CLI first, staging before
-  production, secrets outside the repo.
-- `docs/dns-runbook.md`: Cloudflare custom domain flow, only needed when the
-  app is ready for DNS/custom domains.
-- `scripts/server/render-common.sh`: small helpers for service IDs and
-  environment normalization.
-
-`~/prettyplease` is the reference for the smaller app server shape:
-
-- `server/README.md`: compact Node server setup and Render fields.
-- `server/.env.example`: auth/email/apple config shape without Palette's
-  larger chat/agent surface.
-
-`~/shaba/.claude/worktrees/server-image-gen` is the latest no-dashboard
-bootstrap reference:
-
-- `render.yaml`: API service, gen-art worker, and Postgres in one Blueprint.
-- `scripts/server/render-bootstrap.sh`: creates/updates infra and env vars via
-  Render API, loads `server/.env`.
-- `server/.env.example`: minimal required bootstrap field plus optional
-  defaults as comments.
-
-Do not assume these repos contain live secrets. In the Shaba pass, Palette and
-PrettyPlease only had placeholders/blanks for the shared Render/Resend/OpenAI
-secrets.
-
-## Safe Secret Inspection
-
-Use this to inspect key presence without printing values:
-
-```bash
-redacted_env_status() {
-  awk -F= '
-    /^[A-Za-z_][A-Za-z0-9_]*=/ {
-      key=$1
-      value=substr($0, length(key) + 2)
-      if (value == "") status="blank"
-      else if (value ~ /replace_me|\\.\\.\\.|example|changeme|your_/i) status="placeholder"
-      else status="set"
-      print FILENAME " " key " " status
-    }
-  ' "$@"
-}
-
-redacted_env_status \
-  "$HOME/palette/server/.env" \
-  "$HOME/palette/server/.env.example" \
-  "$HOME/prettyplease/server/.env" \
-  "$HOME/prettyplease/server/.env.example" \
-  "server/.env" \
-  "server/.env.example" 2>/dev/null
+```text
+make server-render-validate
+make server-render-bootstrap ENV=staging
+make server-render-deploy-staging COMMIT=<sha>
+make server-render-verify-staging COMMIT=<sha>
+make server-render-status
 ```
 
-Use this to find candidate env/config files without printing values:
+The checked-in command is the product surface. An agent should not improvise a
+different series of dashboard or API calls for each deployment.
 
-```bash
-find "$HOME/palette" "$HOME/prettyplease" "$HOME/.config" -maxdepth 5 \
-  -type f \( -name ".env" -o -name ".env.*" -o -name "*.env" -o -name "render.env" \) \
-  -print 2>/dev/null |
-while IFS= read -r file; do
-  if rg -q '^(RENDER_API_KEY|RESEND_API_KEY|AUTH_CODE_PEPPER|OPENAI_API_KEY|CLOUDFLARE_|CF_)=' "$file"; then
-    printf '%s\n' "$file"
-    redacted_env_status "$file" |
-      rg ' (RENDER_API_KEY|RESEND_API_KEY|AUTH_CODE_PEPPER|OPENAI_API_KEY|CLOUDFLARE_|CF_) '
-  fi
-done
+## Secret boundary
+
+- Real values live in a gitignored `server/.env`, the Render environment, or a
+  designated secret manager.
+- `.env.example` contains names, descriptions, and safe defaults only.
+- Never search unrelated repositories or machine-global configuration for
+  credentials automatically.
+- Never print environment files, CLI credential stores, provider tokens,
+  database URLs, private keys, or raw request payloads.
+- Diagnostics report a key as `missing`, `blank`, `placeholder`, or `set`; they
+  never report its value.
+- A web service receives only auth/email/database secrets it consumes. A worker
+  receives provider keys only when it performs that provider call.
+- CI credentials are least-privilege and scoped to the repository/environment.
+
+An app may require keys such as `RENDER_API_KEY`, an auth pepper, an email
+provider key, or an image-generation key. The target server README owns the
+actual required set. Do not cargo-cult a key merely because another app used
+it.
+
+## Blueprint contract
+
+The Blueprint should make topology and non-secret defaults reviewable:
+
+- separate staging and production services;
+- API, optional worker, and PostgreSQL declared together when they are one
+  deployable system;
+- `sync: false` or the provider equivalent for secrets;
+- an explicit runtime, region, plan, health check, build command, and start
+  command;
+- staging auto-deploy only when the repository wants it; production promotion
+  stays deliberate;
+- an internal PostgreSQL URL for services running inside Render;
+- migration/predeploy ownership or a worker schema-version gate;
+- bounded worker concurrency and provider spend controls;
+- no customer payloads or credentials in logs.
+
+Remember that replacing a service's environment list may delete keys omitted
+from the request. A bootstrap script that uses a replace-style API must own and
+send the complete intended set, or use a patch endpoint with documented merge
+semantics.
+
+## Bootstrap behavior
+
+`render-bootstrap.sh` should:
+
+1. Require an explicit environment, defaulting at most to staging.
+2. Load only the target repository's gitignored server env file.
+3. Validate required keys by presence/status without printing values.
+4. Resolve the Render workspace and existing resources deterministically.
+5. Create or update PostgreSQL before dependent services.
+6. Create or update services from the checked-in Blueprint shape.
+7. Write the complete intended environment with least-privilege separation.
+8. Trigger the exact requested commit SHA, not an ambient branch tip.
+9. Wait on provider deployment state with a deadline/backoff, not shell sleep.
+10. Run a sanitized smoke check and report service IDs, commit SHA, and status.
+
+Make creation idempotent. Retrying the same environment and commit must update
+or resume the same resources rather than create duplicates.
+
+## Staging, production, and rollback
+
+Use staging as the proving environment:
+
+```text
+validate blueprint
+  -> deploy exact SHA to staging
+  -> run migrations/predeploy
+  -> verify API, worker, and schema version
+  -> record sanitized state
+  -> explicitly promote the same SHA to production
 ```
 
-## Safe Secret Copy Helpers
+Production commands require both an explicit production verb and a confirmation
+value. Rollback redeploys a known prior SHA through the same command surface; it
+does not edit services manually in the dashboard.
 
-These helpers update the target env file without printing the secret. They skip
-blank values and obvious placeholders.
+Capacity and feature toggles should be reversible commands that report before
+and after state. A promotion must fail closed when staging is not on the exact
+requested SHA or when required verification is stale.
 
-```bash
-set_env_key_silent() {
-  key="$1"
-  value="$2"
-  dest="$3"
+## Verification
 
-  case "$value" in
-    ""|*replace_me*|*changeme*|*your_*|"...")
-      return 0
-      ;;
-  esac
-
-  tmp="$(mktemp)"
-  awk -v key="$key" -v value="$value" '
-    BEGIN { updated=0 }
-    /^[A-Za-z_][A-Za-z0-9_]*=/ {
-      split($0, parts, "=")
-      if (parts[1] == key) {
-        print key "=" value
-        updated=1
-        next
-      }
-    }
-    { print }
-    END {
-      if (!updated) print key "=" value
-    }
-  ' "$dest" > "$tmp"
-  mv "$tmp" "$dest"
-}
-
-copy_env_key_silent() {
-  key="$1"
-  src="$2"
-  dest="$3"
-
-  value="$(
-    awk -v key="$key" -F= '
-      $1 == key {
-        print substr($0, length(key) + 2)
-        found=1
-        exit
-      }
-      END {
-        if (!found) exit 2
-      }
-    ' "$src"
-  )" || return 0
-
-  set_env_key_silent "$key" "$value" "$dest"
-  unset value
-}
-```
-
-Examples:
-
-```bash
-# Copy a real value from another env file if it exists there.
-copy_env_key_silent RESEND_API_KEY "$HOME/some-app/server/.env" "server/.env"
-copy_env_key_silent AUTH_CODE_PEPPER "$HOME/some-app/server/.env" "server/.env"
-copy_env_key_silent OPENAI_API_KEY "$HOME/some-app/server/.env" "server/.env"
-
-# Reuse the Render CLI token as RENDER_API_KEY without printing it.
-if [ -f "$HOME/.render/cli.yaml" ]; then
-  render_token="$(awk '/^    key:/ { print $2; exit }' "$HOME/.render/cli.yaml")"
-  set_env_key_silent RENDER_API_KEY "$render_token" "server/.env"
-  unset render_token
-fi
-
-# Reuse Wrangler auth only if adding Cloudflare DNS automation.
-if [ -f "$HOME/Library/Preferences/.wrangler/config/default.toml" ]; then
-  cf_token="$(
-    python3 - <<'PY'
-import pathlib
-import re
-
-path = pathlib.Path.home() / "Library/Preferences/.wrangler/config/default.toml"
-match = re.search(r'oauth_token\\s*=\\s*"([^"]+)"', path.read_text())
-if match:
-    print(match.group(1))
-PY
-  )"
-  set_env_key_silent CLOUDFLARE_API_TOKEN "$cf_token" "server/.env"
-  unset cf_token
-fi
-```
-
-## What Not To Do
-
-- Do not paste prose into zsh as commands. Paste this context into the agent.
-- Do not run `cat server/.env`, `cat ~/.render/cli.yaml`, `printenv`, or `env`
-  in a way that sends secret values to chat.
-- Do not copy placeholders from `.env.example` into the real target env as if
-  they were secrets.
-- Do not require humans to fill `DATABASE_URL` for Render services when the
-  bootstrap can read the internal Render Postgres connection string.
-- Do not add Cloudflare as required for a plain Render staging deploy. It is
-  only needed for custom domains or DNS automation.
-
-## Verification Checklist
-
-After implementation:
+The repository should leave one aggregate check behind. A baseline is:
 
 ```bash
 render blueprints validate render.yaml --output json --confirm
@@ -266,4 +123,16 @@ git diff --check
 npm --prefix server run verify
 ```
 
-Adjust the final command to the target repo's server verification target.
+Broaden it according to risk:
+
+- fixture tests for Blueprint parsing and environment-set construction;
+- denial tests for production confirmation and invalid environments;
+- migration tests against a real PostgreSQL service in CI;
+- idempotency tests with a fake provider API;
+- sanitized staging smoke against an exact SHA;
+- secret scanning over full Git history.
+
+The handoff is complete when another agent can discover every supported
+operation from `make help` and `server/README.md`, execute staging without the
+dashboard, and cannot deploy production or disclose a secret by using the
+ordinary command path.

@@ -31,10 +31,14 @@
       "type": "object",
       "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
       "additionalProperties": { "$ref": "#/$defs/tier" }
-    }
+    },
+    "workflow": { "$ref": "#/$defs/workflow" }
   },
   "$defs": {
     "ruleId": { "type": "string", "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$" },
+    "checkRef": { "type": "string", "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$" },
+    "envVar": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+    "duration": { "type": "string", "pattern": "^[0-9]+[smhd]$" },
     "commandRef": { "type": "string", "minLength": 1 },
     "rulepack": {
       "type": "object",
@@ -56,8 +60,27 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["severity", "fix", "exemplar"],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "severity": { "const": "ratchet" } },
+            "required": ["severity"]
+          },
+          "then": { "required": ["baseline"] }
+        }
+      ],
       "properties": {
-        "severity": { "enum": ["error", "warn"] },
+        "severity": { "enum": ["error", "warn", "ratchet"] },
+        "baseline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ref", "limit"],
+          "properties": {
+            "ref": { "$ref": "#/$defs/envVar" },
+            "limit": { "type": "string", "minLength": 1 },
+            "hard": { "type": "string", "minLength": 1 }
+          }
+        },
         "fix": { "type": "string", "minLength": 1 },
         "exemplar": { "type": "string", "minLength": 1 },
         "scope": {
@@ -132,19 +155,53 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["kind", "provider", "identity", "owner", "release", "guards"],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "pool-lease" } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["pool"] }
+        }
+      ],
       "properties": {
-        "kind": { "enum": ["process-lease"] },
+        "kind": { "enum": ["process-lease", "pool-lease"] },
         "provider": { "enum": ["macos-lockf"] },
         "identity": { "type": "string", "minLength": 1 },
         "owner": { "enum": ["agent-session"] },
-        "release": { "enum": ["process-exit"] },
+        "release": {
+          "oneOf": [
+            { "$ref": "#/$defs/releaseMode" },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/releaseMode" }
+            }
+          ]
+        },
+        "pool": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["select"],
+          "properties": {
+            "select": { "$ref": "#/$defs/commandRef" },
+            "affinity": { "enum": ["worktree", "session", "none"] },
+            "ttl": { "$ref": "#/$defs/duration" },
+            "keepalive": { "$ref": "#/$defs/commandRef" },
+            "warm": { "type": "integer", "minimum": 0 },
+            "reap-grace": { "$ref": "#/$defs/duration" }
+          }
+        },
         "guards": {
           "type": "array",
           "minItems": 1,
           "items": { "$ref": "#/$defs/commandRef" }
-        }
+        },
+        "test": { "$ref": "#/$defs/commandRef" }
       }
     },
+    "releaseMode": { "enum": ["process-exit", "ttl-expiry", "explicit"] },
     "tier": {
       "type": "object",
       "additionalProperties": false,
@@ -152,6 +209,88 @@
       "properties": {
         "verbs": { "type": "array", "minItems": 1, "items": { "type": "string" } },
         "require-workorder": { "type": "boolean" }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "writer-isolation": { "$ref": "#/$defs/writerIsolation" },
+        "lanes": { "$ref": "#/$defs/lanes" },
+        "admission": { "$ref": "#/$defs/admission" }
+      }
+    },
+    "writerIsolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "create", "guards"],
+      "properties": {
+        "kind": { "enum": ["worktree-lease"] },
+        "registry": { "type": "string", "minLength": 1 },
+        "create": { "$ref": "#/$defs/commandRef" },
+        "status": { "$ref": "#/$defs/commandRef" },
+        "close": { "$ref": "#/$defs/commandRef" },
+        "reap": { "$ref": "#/$defs/commandRef" },
+        "max-active": { "type": "integer", "minimum": 1 },
+        "guards": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/guard" }
+        },
+        "test": { "$ref": "#/$defs/commandRef" }
+      }
+    },
+    "guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "event", "command", "fails"],
+      "properties": {
+        "surface": { "enum": ["git-hook", "editor-tool"] },
+        "event": { "type": "string", "minLength": 1 },
+        "matcher": { "type": "string", "minLength": 1 },
+        "command": { "$ref": "#/$defs/commandRef" },
+        "escape": { "$ref": "#/$defs/envVar" },
+        "fails": { "enum": ["open", "closed"] }
+      }
+    },
+    "lanes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "modes"],
+      "properties": {
+        "selector": { "$ref": "#/$defs/envVar" },
+        "default": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "modes": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+          "additionalProperties": { "$ref": "#/$defs/lane" }
+        }
+      }
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "describe": { "type": "string", "minLength": 1 },
+        "pre-commit": { "type": "array", "items": { "$ref": "#/$defs/checkRef" } },
+        "pre-push": { "type": "array", "items": { "$ref": "#/$defs/checkRef" } }
+      }
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requires"],
+      "properties": {
+        "branch": { "type": "string", "minLength": 1 },
+        "open": { "$ref": "#/$defs/commandRef" },
+        "queue": { "$ref": "#/$defs/commandRef" },
+        "requires": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/checkRef" }
+        },
+        "remote": { "$ref": "#/$defs/commandRef" }
       }
     }
   }

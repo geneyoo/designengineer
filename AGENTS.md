@@ -35,7 +35,10 @@ The repo should favor:
 
 ## File Map
 
-- `README.md`: current thesis and product direction.
+- `README.md`: public entry point, runnable CLI quick start, and repository map.
+- `bin/designengineer.mjs`: scan, proposal, verify, status, and assert CLI.
+- `docs/development-flow.md`: current hooks-first and guarded multi-agent
+  workflows, adoption order, and agent handoff prompt.
 - `docs/onboarding.md`: new-project vs existing-project setup, scan, and
   migration flow.
 - `docs/position.md`: the longer initial argument.
@@ -48,8 +51,9 @@ The repo should favor:
   closed input sets, fail-closed aggregation, and dated cost evidence.
 - `docs/research/rulepacks.md`: taste, design-system, copy, and asset-style
   checks normalized into reusable repo-local contracts.
-- `docs/resource-leases.md`: process-owned exclusive-resource contract and
-  repo integration pattern.
+- `docs/resource-leases.md`: fixed and pooled process-owned resource contracts.
+- `docs/workflow-guards.md`: writer isolation, lanes, admission, ratchets, and
+  the drop-in order.
 - `schema/config.schema.json`: normative contract for
   `.designengineer/config.yaml`; doc YAML examples must validate against it.
 - `schema/workorder.schema.json`: contract for work-order files.
@@ -62,8 +66,12 @@ The repo should favor:
 - `tools/paths-changed.sh`: fail-closed, path-scoped Git change detector;
   `tools/test-paths-changed.sh` covers positive, negative, error, and usage
   cases.
+- `tools/test-cli.mjs`: fixture coverage for non-destructive adoption and
+  evidence invalidation.
 - `.github/workflows/admission.yml`: Linux portable checks plus a
   change-scoped and weekly macOS resource-lease lane behind one stable status.
+- `.github/workflows/secret-scan.yml`: full-history Gitleaks on PRs, main,
+  schedule, and manual dispatch.
 - `.designengineer/config.yaml`: this repo's own harness config.
 
 ## Local Checks

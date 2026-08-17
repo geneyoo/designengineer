@@ -105,6 +105,19 @@ git commit -m "chore: bump build to N"
 
 - [ ] App listing copy is final: name, subtitle, promotional text, description, keywords.
 - [ ] Screenshots meet current device slots; never upload placeholders.
+- [ ] If using the shared screenshot factory, add a repo-local config and target:
+  - `marketing/app-store-screenshots/<app>.json` is the source of truth for titles, theme, source filenames, and output folder.
+  - `marketing/app-store-screenshots/source/` holds raw simulator/device captures and is usually gitignored.
+  - `marketing/app-store-screenshots/final/<device-slot>/` holds the final ASC-ready PNGs once approved.
+  - `make app-store-screenshots` should call the renderer with the repo-local config.
+  - Missing screenshots may render as placeholders; delete placeholder output or keep it out of git, and never upload it to App Store Connect.
+  Example:
+
+```make
+app-store-screenshots:
+	./scripts/marketing/appshot render --config marketing/app-store-screenshots/app.json
+```
+
 - [ ] Reviewer notes explain core permissions and the fastest happy-path test flow.
 - [ ] Select the processed build in the App Store version page.
 - [ ] Confirm privacy answers still match the exact submitted binary.
@@ -113,7 +126,8 @@ git commit -m "chore: bump build to N"
 
 ## 7. Shared Tooling
 
-- `ios-release`: local wrapper from `~/ios-release-toolkit`; delegates archive/export/upload to Xcode and ASC API credentials.
+- `scripts/ios/release.sh`: repo-local wrapper that delegates archive/export/upload to Xcode and ASC API credentials.
+- `scripts/marketing/appshot`: vendored or repo-owned App Store screenshot renderer; use a repo-local JSON config and Makefile target so each app owns its screenshot story.
 - `~/.config/ios-release/defaults.env`: machine-global `ASC_KEY_ID`, `ASC_ISSUER`, `TEAM_ID`.
 - `~/.appstoreconnect/private_keys/AuthKey_<ASC_KEY_ID>.p8`: ASC API key location.
 

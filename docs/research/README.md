@@ -20,7 +20,11 @@ Useful pieces to adopt:
 Decision:
 ```
 
-## Initial Queue
+Research notes are evidence and proposals, not the current install surface.
+Implemented behavior is documented in `../../README.md` and
+`../development-flow.md`; each note should label commands that remain roadmap.
+
+## Initial queue
 
 - Local prior art: `palette`
 - Local prior art: `shaba`
@@ -40,11 +44,12 @@ Decision:
 - Supabase MCP
 - AWS Agent Toolkit
 
-## Current Hypothesis
+## Current hypothesis
 
-Most existing tools improve agent capability or workflow. The open opportunity
-is a repo-local harness that turns design-system and architecture rules into
-checks, hooks, verification evidence, and quality-controlled factories.
+Most existing tools improve agent capability or workflow. This repository now
+ships the first repo-local harness slice: inventory, config proposal, check
+execution, and verification evidence. The open work is proving which additional
+rulepacks, factories, and workflow guards improve outcomes in another repo.
 
 The current bias is extraction over invention: prove the harness by lifting
 working machinery out of local repos first.

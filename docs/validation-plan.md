@@ -3,44 +3,34 @@
 The deliverable is a repo-local harness, not a prose methodology. It should
 make the fast path faster and the wrong path obvious.
 
-## Product Shape
+## Shipped product shape
 
 Working product: **Design Engineer Harness**.
 
-Core CLI:
+Current CLI:
 
 ```bash
-designengineer init
-designengineer init --adopt
-designengineer init --new
-designengineer scan
-designengineer check changed
-designengineer verify <check>
+designengineer scan [repo]
+designengineer scan [repo] --write <proposal>
+designengineer init --adopt [repo]
+designengineer verify <check|all>
 designengineer verify factory.<factory>
 designengineer status
 designengineer assert <check>
-designengineer workorder create
-designengineer exemplars list [kind]
-designengineer check exemplars
-designengineer factory list
-designengineer factory run <factory>
-designengineer factory check <factory>      # alias for verify factory.<factory>
-designengineer factory preview <factory>
-designengineer add-rulepack <id> --check <command>
-designengineer verify rulepack.<id>
-designengineer report rules
 ```
+
+`scan` inventories existing entry points and proposes, but never installs,
+policy. `verify`, `status`, and `assert` are the first evidence path. Factory
+run/preview commands, work-order verbs, per-lane fingerprints, rule reports,
+and new-project scaffolding remain roadmap items.
 
 Project files:
 
 ```text
 .designengineer/config.yaml
-.designengineer/workorders/
 .designengineer/ledger.jsonl      # gitignored
-.designengineer/exemplars.json
 .githooks/pre-commit
-.githooks/pre-push
-AGENTS.md                         # patched with local usage rules
+AGENTS.md
 ```
 
 Optional plugin layer:
@@ -52,20 +42,18 @@ skills/
   fix-check-failure
 
 hooks/
-  PostToolUse: designengineer check changed --fast
-  Stop: designengineer assert workorder
+  Stop: designengineer assert <required-check>
 ```
 
 The CLI is the product. Plugins only teach agents to use it.
 
-The first run has two modes. `init --adopt` scans an existing project and
-proposes wrappers around current hooks, checks, assets, and style language.
-`init --new` creates a thin starter contract for a blank repo. See
-`docs/onboarding.md`.
+`init --adopt` scans an existing project and writes a non-destructive proposed
+config. New-project scaffolding is deliberately agent-guided rather than
+generated. See `docs/onboarding.md`.
 
-There is one evidence system. `factory check web-tokens` writes the same
-ledger entry as `verify factory.web-tokens`, and `assert factory.web-tokens`
-uses the same freshness rules as every other check.
+There is one evidence system. `verify factory.web-tokens` and
+`assert factory.web-tokens` use the same ledger and freshness rules as every
+other check.
 
 ## DX Invariants
 
@@ -74,7 +62,7 @@ These are product constraints, not aspirations.
 - Block sharing, never iterating. Checks gate commit, push, and done-claims;
   they do not block saving files, running the app, or exploration.
 - Fast checks are the dopamine. Pre-commit checks should stay under 5 seconds;
-  `check changed` should stay under 30 seconds.
+  the ordinary explicit verification lane should stay under 30 seconds.
 - Slow checks move later. Full builds, snapshots, device runs, staging smoke,
   and dependency audits belong in pre-push, CI, or explicit `verify`.
 - CI lanes are capability-scoped. Default to the cheapest runner that can run
@@ -94,15 +82,16 @@ These are product constraints, not aspirations.
 - Delete flaky rules quickly. One noisy rule damages trust in the whole
   harness.
 
-## V0 Scope
+## V0 status
 
-V0 should prove value inside `palette` before becoming generic.
+The generic CLI now ships repository inventory, config proposal, whole-tree
+fingerprinting, check execution, status, and assertion. Fixture tests prove
+safe writes and evidence invalidation. The remaining v0 work is adoption and
+measurement in a second repository:
 
 1. Wrap existing lane verification:
-   - consume `tools/lanes/detect.sh`
-   - run existing `make *-verify` targets
-   - append ledger entries
-   - expose `status` and `assert`
+   - register existing `make *-verify` targets from scan output
+   - refine whole-tree fingerprints only after needless invalidation is measured
    - record each lane's CI command, required capabilities, and complete input
      set
    - verify selector fixtures and required-status failure propagation
@@ -260,17 +249,17 @@ Failure criteria:
 - factory checks create a parallel evidence path outside the ledger
 - adoption PR mixes unrelated generated assets or feature work
 
-## Sequence
+## Next sequence
 
-1. Build ledger v0 in `palette`.
-2. Add taught failures to one design-system check.
-3. Register one fast rulepack candidate, starting with an existing
+1. Adopt scan/verify/status/assert into a second repository.
+2. Add taught failures to one design-system check there.
+3. Register one fast rulepack, starting with an existing
    design-system or copy-style script.
 4. Add adoption scope output: included, detected-deferred, unmanaged, and
    unrelated-dirty files.
 5. Add escape-hatch counting.
 6. Register `web-tokens` as the first factory candidate.
-7. Wire `factory check web-tokens` to `verify factory.web-tokens`.
+7. Wire the token drift command to `verify factory.web-tokens`.
 8. Add or declare the missing token preview path.
 9. Add one work-order path for a weak-agent task.
 10. Run the eval.

@@ -23,7 +23,7 @@ const workorderSchema = JSON.parse(readFileSync(join(repoRoot, 'schema/workorder
 const validateConfig = ajv.compile(configSchema)
 const validateWorkorder = ajv.compile(workorderSchema)
 
-const CONFIG_KEYS = new Set(['version', 'rulepacks', 'checks', 'factories', 'resources', 'tiers'])
+const CONFIG_KEYS = new Set(['version', 'rulepacks', 'checks', 'factories', 'resources', 'tiers', 'workflow'])
 const WORKORDER_KEYS = new Set(['task', 'scope', 'exemplar', 'done'])
 
 const failures = []
@@ -98,7 +98,7 @@ for (const file of files) {
     } else {
       const unknown = keys.filter(k => !CONFIG_KEYS.has(k) && !WORKORDER_KEYS.has(k))
       fail('docs.unknown-example-shape', rel(file), startLine, `unknown top-level keys: ${unknown.join(', ')}`,
-        'Use config keys (version/rulepacks/checks/factories/resources/tiers), work-order keys, or add a docs-ok escape above the block.',
+        'Use config keys (version/rulepacks/checks/factories/resources/tiers/workflow), work-order keys, or add a docs-ok escape above the block.',
         'schema/config.schema.json')
     }
   }

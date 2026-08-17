@@ -1,5 +1,10 @@
 # Initial Position
 
+> Historical thesis. For the shipped interface and current operating model,
+> start with [`../README.md`](../README.md) and
+> [`development-flow.md`](development-flow.md). Commands below may describe
+> roadmap concepts rather than implemented CLI surface.
+
 The best way to scale agents is to stop treating them as autonomous senior
 engineers and start treating the repo as an executable operating system.
 

@@ -123,7 +123,7 @@ Every `exemplar:` path emitted by a rule must exist and be committed or staged
 in the same adoption scope. A failure that points to an untracked preview file
 is worse than no exemplar because weak agents will copy from unstable context.
 
-Add a meta-check:
+Proposed meta-check:
 
 ```bash
 designengineer check exemplars
@@ -136,7 +136,7 @@ the current PR scope.
 
 ### Shaba copy style
 
-`~/shaba/scripts/ios/no-em-dash-check.sh` is the smallest proven rulepack
+`shaba: scripts/ios/no-em-dash-check.sh` is the smallest proven rulepack
 candidate:
 
 - scans the repo with `git grep`

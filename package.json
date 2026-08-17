@@ -1,15 +1,40 @@
 {
-  "name": "designengineer",
+  "name": "@designengineer-test/designengineer",
+  "version": "0.1.0",
+  "description": "Executable repo-local workflow contracts for design-engineering agents",
   "private": true,
   "type": "module",
+  "license": "MIT",
+  "bin": {
+    "designengineer": "bin/designengineer.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "check": "make check",
     "check:portable": "make check-portable",
+    "test:cli": "node tools/test-cli.mjs",
     "test:paths-changed": "bash tools/test-paths-changed.sh",
     "test:resource-lease": "bash tools/test-resource-lease.sh"
   },
   "dependencies": {
     "ajv": "^8.17.1",
-    "js-yaml": "^4.1.0"
-  }
+    "js-yaml": "^4.3.1"
+  },
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geneyoo/designengineer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/geneyoo/designengineer/issues"
+  },
+  "homepage": "https://github.com/geneyoo/designengineer#readme"
 }

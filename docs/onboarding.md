@@ -1,6 +1,6 @@
 # Onboarding And Migration
 
-The harness needs two first-run paths:
+The adoption model has two first-run paths:
 
 - `new`: starting a project from scratch
 - `adopt`: integrating into an existing project with partial rules, assets,
@@ -11,20 +11,22 @@ already have taste in scripts, Makefiles, docs, screenshots, style guides,
 asset catalogs, and local habits. The harness should detect and wrap that
 system before inventing anything.
 
-## First-Run Commands
+The CLI ships the existing-project inventory path. New-project setup remains an
+agent-guided contract because stack-specific files should not be generated
+before the product and enforcement surface are known.
+
+## First-run commands
 
 ```bash
-designengineer init --adopt
-designengineer scan
-designengineer scan --write .designengineer/proposed-config.yaml
-designengineer adopt --from-scan
-
-designengineer init --new
+designengineer scan .
+designengineer init --adopt .
+# equivalent explicit destination:
+designengineer scan . --write .designengineer/proposed-config.yaml
 ```
 
-`scan` should be read-only by default. It should not install hooks, rewrite
-files, promote new blocking rules, or generate assets. It produces an inventory
-and a proposed config.
+`scan` is read-only by default. It does not install hooks, rewrite files,
+promote blocking rules, or generate assets. `--write` creates only the requested
+proposal and refuses to overwrite an existing file.
 
 ## Existing Project Path
 
@@ -34,23 +36,26 @@ Existing projects get an audit first:
 detect -> classify -> propose scope -> wrap -> measure -> promote
 ```
 
-Detection should look for:
+The current scanner detects:
 
 - public entry points: `Makefile`, `package.json`, `justfile`, `Taskfile`,
   `xcodegen`, SwiftPM, npm scripts
-- hooks: `.githooks`, `.git/hooks`, `core.hooksPath`, Claude/Codex hooks
-- CI: GitHub Actions, Xcode Cloud notes, Vercel/Cloudflare deploy checks
-- lint and test tools: SwiftLint, ESLint, Stylelint, Prettier, Vitest, XCTest
+- committed `.githooks`, the active `core.hooksPath`, and GitHub Actions
+- Make and package scripts named like `check`, `verify`, `lint`, or `test`
 - design-system files: `StyleGuide`, `DesignSystem`, `tokens`, `themes`,
   `components`, `gallery`, `catalog`
 - asset sources: app icons, brand SVGs, screenshot configs, generated asset
   catalogs, marketing image scripts
 - source-of-truth docs: `AGENTS.md`, `CLAUDE.md`, README, style docs,
   `themes/*.instructions.md`
-- existing escape hatches: `design-ok:`, `copy-ok:`, rule-specific allow tags
+- existing `design-ok:`, `copy-ok:`, `docs-ok:`, and `sparkles-ok:` escapes
 - generated outputs without drift checks
-- scripts whose names include `check`, `verify`, `lint`, `design`, `tokens`,
-  `icon`, `asset`, `snapshot`, `screenshot`, `gallery`, or `audit`
+- scripts and configs whose names suggest checks, tokens, icons, assets,
+  screenshots, galleries, or catalogs
+
+It reports signals rather than claiming semantic understanding. An agent still
+has to trace which commands are stable, which workflow consumes them, and which
+generated files have real source/preview contracts.
 
 The scan should classify each finding:
 
@@ -66,7 +71,7 @@ unmanaged       known workflow that should not be gated yet
 unknown         human review needed
 ```
 
-The product should then suggest the smallest safe moves:
+The report suggests the smallest safe moves:
 
 1. Wrap existing checks as rulepacks.
 2. Add ledger recording.
@@ -96,8 +101,8 @@ unmanaged           workflows intentionally not gated
 unrelated-dirty     local changes the harness must not stage
 ```
 
-`designengineer adopt --from-scan` should stage only `included` files. A
-`--verify-scope` pass should fail when:
+There is deliberately no automatic staging command yet. The adopting agent or
+human should stage only `included` files and verify manually that:
 
 - a registered factory references an untracked source or preview file
 - a rule `exemplar:` path is missing or untracked
@@ -106,7 +111,7 @@ unrelated-dirty     local changes the harness must not stage
 
 This is the practical difference between `detected` and `adopted`.
 
-## New Project Path
+## New project path
 
 New projects should get a thin paved road, not a large framework.
 
@@ -125,7 +130,7 @@ scripts/design-system-check.sh
 scripts/copy-style-check.sh
 ```
 
-The new-project path should ask for stack and product shape, then create only:
+An adopting agent should ask for stack and product shape, then create only:
 
 - a minimal style formula
 - one fast copy-style rulepack
@@ -156,9 +161,9 @@ ladder:
 This lets mature repos keep momentum. The harness starts as an observability
 and wrapping layer, then earns the right to block.
 
-## First Screen
+## Scan output
 
-The NUX should show a short report:
+The CLI prints a short report with this shape:
 
 ```text
 Found:

@@ -35,22 +35,25 @@ If any of those are missing, call it a factory candidate and make
 `factory status` show the missing criterion. Do not call it a proven factory
 until all criteria are satisfied.
 
-## Local Prior Art
+## Source-repository prior art
+
+The `repo: path` references below record provenance; those source repositories
+are not dependencies of the portable contract.
 
 ### Palette Web Tokens: First Factory Candidate
 
 Source of truth:
 
-- `~/palette/themes/*.instructions.md`
+- `palette: themes/*.instructions.md`
 
 Generator:
 
-- `~/palette/scripts/www/build-tokens.mjs`
+- `palette: scripts/www/build-tokens.mjs`
 
 Outputs:
 
-- `~/palette/www/src/ui/tokens.css`
-- `~/palette/www/src/ui/tokens.ts`
+- `palette: www/src/ui/tokens.css`
+- `palette: www/src/ui/tokens.ts`
 
 Quality control:
 
@@ -79,17 +82,17 @@ let rulepacks reject outputs that ignore the declared style.
 
 Source of truth:
 
-- `~/palette/apps/ios/Palette/UI/DesignSystem/Gallery/PaletteDesignSystemCatalog.swift`
+- `palette: apps/ios/Palette/UI/DesignSystem/Gallery/PaletteDesignSystemCatalog.swift`
 
 Generator:
 
-- `~/palette/scripts/ios/design-system-gallery.sh`
+- `palette: scripts/ios/design-system-gallery.sh`
 
 Outputs:
 
-- `~/palette/build/ios-design-system-gallery/index.html`
+- `palette: build/ios-design-system-gallery/index.html`
 - rendered component images under
-  `~/palette/build/ios-design-system-gallery/images/`
+  `palette: build/ios-design-system-gallery/images/`
 
 Quality control:
 
@@ -111,11 +114,11 @@ second factory after web tokens because its invalidation model is harder.
 
 Source of truth:
 
-- `~/palette/wip_assets/palette-app-icon-1024.png`
+- `palette: wip_assets/palette-app-icon-1024.png`
 
 Generator:
 
-- `~/palette/scripts/ios/generate-app-icons.sh`
+- `palette: scripts/ios/generate-app-icons.sh`
 
 Outputs:
 
@@ -137,7 +140,7 @@ instead of leaving agents to manually create many image sizes.
 
 Source of truth:
 
-- `~/prettyplease/scripts/ios/render-brand-assets.sh`
+- `prettyplease: scripts/ios/render-brand-assets.sh`
 - brand colors and icon geometry used by the app style system
 
 Generator:
@@ -165,12 +168,12 @@ it catches regressions in bounds, centering, and palette consistency.
 
 Source of truth:
 
-- `~/prettyplease/marketing/app-store-screenshots/prettyplease.json`
+- `prettyplease: marketing/app-store-screenshots/prettyplease.json`
 - captured app screenshots and brand assets
 
 Generator:
 
-- `~/prettyplease/scripts/marketing/appshot`
+- `prettyplease: scripts/marketing/appshot`
 - `make app-store-screenshots`
 
 Outputs:
@@ -190,9 +193,10 @@ deterministic for a tree, but the final approval is taste- and market-coupled,
 so the ledger should record screenshot approval with a human timestamp and
 expiry.
 
-## Product Implication
+## Roadmap implication
 
-Design Engineer Harness should treat factories as a first-class primitive:
+The config schema and `verify factory.<id>` evidence path ship today. The
+following convenience commands are proposed, not implemented:
 
 ```bash
 designengineer factory list
@@ -203,8 +207,8 @@ designengineer factory status
 designengineer verify factory.web-tokens
 ```
 
-`factory check <id>` is an alias for `verify factory.<id>`. Factories must not
-create a parallel verification system.
+Any future `factory check <id>` alias must delegate to `verify factory.<id>`.
+Factories must not create a parallel verification system.
 
 The harness should not assume every repo needs scaffolding generators. It
 should discover or declare factories that already exist, then standardize:
